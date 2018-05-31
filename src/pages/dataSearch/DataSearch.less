@@ -1,0 +1,374 @@
+@import '../../style/mixins.less';
+@border-color: #d0e1f1;
+
+.center-block {
+    width: 40%;
+    margin: 0 auto;
+}
+
+#dataSearch {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    color: #999;
+    background: #fff url('../../images/relationGraph/bg.gif') 0 100% no-repeat;
+    background-size: contain;
+
+    .data-search-title {
+        margin-top: 10%;
+        transition: all .6s ease;
+        &:extend(.center-block);
+
+        h1 {
+            font-size: 46px;
+            text-align: center;
+            color: #0e81ef;
+
+            img {
+                margin-right: 20px;
+                vertical-align: middle;
+            }
+
+        }
+
+        h4 {
+            margin-top: 30px;
+            font-size: 14px;
+            transition: all .6s ease;
+            text-align: center;
+
+            span {
+                margin: 0 10px;
+                font-size: 20px;
+                color: #5b90e7;
+            }
+
+        }
+
+    }
+
+    .data-search-input {
+        width: 42%;
+        margin: 36px auto 9px;
+        position: relative;
+        text-align: center;
+        letter-spacing: -4px;
+
+        .ivu-auto-complete {
+            width: 100%;
+            letter-spacing: 0;
+            .inline-block;
+
+            /deep/ input {
+                height: 50px;
+                padding: 0 77px 0 10px;
+                line-height: 50px;
+                border: 1px solid #dae6f9;
+                border-radius: 4px;
+                background-color: #f5f9ff;
+            }
+
+            /deep/ .ivu-input-icon {
+                height: 50px;
+                line-height: 50px;
+            }
+
+            /deep/ .ivu-select-dropdown-list {
+                overflow-x: hidden;
+                max-height: 200px;
+                text-align: left;
+
+                li {
+                    overflow: hidden;
+                    width: 100%;
+                    padding-right: 50px;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+            }
+
+        }
+
+        /deep/.ivu-btn {
+            height: 50px;
+            padding: 0px 26px;
+            font-size: 24px;
+            line-height: 52px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-radius: 0 4px 4px 0;
+            .inline-block;
+        }
+
+        &.top {
+            margin: 0;
+            position: absolute;
+            z-index: 10 !important;
+            top: 15px;
+            right: 10px;
+        }
+
+    }
+
+    .toggle-rule {
+        width: 42%;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+        text-align: right;
+        color: #a5b3c7;
+        &:extend(.center-block);
+
+        .ivu-icon {
+            margin-left: 10px;
+        }
+
+    }
+
+    .rule-wrapper {
+        width: 42%;
+        margin-top: 3px;
+        color: #a5b3c7;
+        &:extend(.center-block);
+
+        .ivu-icon {
+            margin-right: 8px;
+            font-size: 16px;
+            vertical-align: middle;
+        }
+
+        .rule-list {
+            margin-left: 22px;
+
+            .rule-item {
+                line-height: 20px;
+            }
+
+        }
+
+    }
+
+    .data-search-content {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        padding: 80px 10px 10px 10px;
+        position: relative;
+
+        .content-title {
+            width: 100%;
+            height: 34px;
+            padding: 0 30px 0 20px;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 34px;
+            position: absolute;
+            z-index: 9;
+            top: 0;
+            color: #2b3646;
+            border: 1px solid @border-color;
+            border-bottom: none;
+            .vertical-gradient(#ffffff, #eff6ff);
+
+            i {
+                font-weight: normal;
+                font-style: normal;
+                color: #68778c;
+            }
+
+            span {
+                margin: 0 5px;
+                font-weight: bold;
+                color: #fe3232;
+            }
+
+        }
+
+        .content-left {
+            float: left;
+            width: 250px;
+            height: 100%;
+            padding-top: 34px;
+            position: relative;
+            background: #fff;
+
+            h4 {
+                position: absolute;
+                z-index: 1000;
+                text-align: left;
+            }
+
+            .tree-wrapper {
+                overflow: auto;
+                height: 100%;
+                position: relative;
+                position: relative;
+                border: 1px solid @border-color;
+                background: #f7faff;
+                .custom-scroll;
+
+                .ivu-tree {
+                    padding: 10px 20px;
+
+                    /deep/ .selectNodeBg,
+                    /deep/ .hoverNodeBg {
+                        border-top: 1px solid @border-color;
+                        border-bottom: 1px solid @border-color;
+                        background-color: #d3ebff !important;
+                    }
+
+                    /deep/ .ivu-tree-arrow {
+                        position: relative;
+                        z-index: 100! important;
+                    }
+
+                    /deep/ .fontColor,
+                    /deep/ .hFontColor {
+                        color: #0394f9 ! important;
+                    }
+
+                    /deep/ li {
+                        margin: 0;
+                    }
+
+                }
+
+            }
+
+        }
+
+        .content-right {
+            overflow: hidden;
+            height: 100%;
+            margin-left: 260px;
+            padding-top: 34px;
+            position: relative;
+            background: #fff;
+
+            .searchType {
+                height: 38px;
+                position: absolute;
+                z-index: 10;
+                top: 0;
+                left: 220px;
+
+                span {
+                    display: inline-block;
+                    width: 44px;
+                    height: 24px;
+                    margin-top: 5px;
+                    font-size: 12px;
+                    line-height: 24px;
+                    cursor: pointer;
+                    text-align: center;
+                    color: #68778c;
+                    border-radius: 4px;
+
+                    &.on {
+                        color: #fff;
+                        background: #55b0ff;
+                    }
+
+                    &:hover {
+                        font-weight: bold;
+                        color: #55b0ff;
+
+                        &.on {
+                            font-weight: normal;
+                            color: #fff;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            .content-wrapper {
+                height: 100%;
+                padding: 0 0 64px 0;
+
+                .content {
+                    overflow: auto;
+                    height: 100%;
+                    padding: 7.5px;
+                    border: 1px solid @border-color;
+                    background: #f7faff;
+                    .custom-scroll;
+
+                    .card-wrapper {
+                        float: left;
+                        width: 20%;
+                        padding: 7.5px;
+                        position: relative;
+
+                        .caseState {
+                            position: absolute;
+                            top: 0px;
+                            left: 0px;
+                        }
+
+                        .avatar {
+                            width: 100%;
+                            height: 150px;
+                        }
+
+                        p {
+                            height: 26px;
+                            line-height: 26px;
+                            color: #68778c;
+                            .text-overflow;
+
+                            .carBackground {
+                                padding: 2px 5px;
+                                color: #fff;
+                                border-radius: 2px;
+                                background: #2a84ea;
+                            }
+
+                        }
+
+                        .ivu-card {
+                            border: 4px solid #e1ecf5;
+
+                            /deep/ .ivu-card-body {
+                                padding: 0 0 3px 0;
+                                text-align: center;
+                                background-color: #ffffff;
+                            }
+
+                            &:hover {
+                                border-color: #86c7f5;
+                                box-shadow: 5px 5px 7px rgba(85, 176, 255, .3);
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            .ivu-page {
+                width: 100%;
+                padding: 20px 0;
+                position: absolute;
+                bottom: 0;
+                text-align: right;
+                background: #fff;
+
+                /deep/ .ivu-select-dropdown {
+                    top: -125px !important;
+                }
+
+            }
+
+        }
+
+    }
+
+}

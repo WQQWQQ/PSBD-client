@@ -1,0 +1,79 @@
+@import '../../style/mixins';
+
+.case-detail-modal {
+    /deep/ .ivu-modal {
+        max-width: 900px !important;
+        max-height: 737px !important;
+
+        .ivu-modal-content {
+            .ivu-modal-close:hover {
+                background-color: rgba(0, 0, 0, .2);
+            }
+
+            .ivu-modal-header {
+                border-radius: 4px 4px 0 0;
+            }
+
+            .ivu-modal-footer {
+                border-radius: 0 0 4px 4px;
+            }
+
+        }
+
+        section {
+            &:first-child {
+                .bm-head {
+                    border-top: none !important;
+                }
+
+            }
+
+            .bm-head {
+                height: 35px;
+                font-size: 14px;
+                line-height: 35px;
+                text-indent: 15px;
+                color: #2b3646;
+                border: 1px solid #cee0f0;
+                border-bottom: 1px solid #eee;
+                background-color: #f7faff;
+            }
+
+            .info-wrapper {
+                padding: 10px 20px;
+                border-top: 1px dashed #eee;
+
+                &:first-of-type {
+                    border-width: 0;
+                }
+
+                p {
+                    overflow: hidden;
+                    height: 33px;
+                    line-height: 33px;
+                    color: #68778c;
+
+                    span {
+                        float: left;
+                        width: 33.3%;
+                        .text-overflow;
+                    }
+
+                    i {
+                        font-style: normal;
+
+                        &:nth-child(even) {
+                            color: #2b3646;
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+}

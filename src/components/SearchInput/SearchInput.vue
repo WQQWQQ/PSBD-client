@@ -1,0 +1,70 @@
+<style scoped lang="less" src="./SearchInput.less"></style>
+<template>
+    <div class="cmp-search-input" :class="{'large-input':type=='large','has-button':!!btnText || !!btnIcon,'is-ie9':isIE9,'no-icon':!inputIcon}">
+        <Input ref="searchInput" @click.native="onClick" @on-keyup="onInputChange" @on-blur="onBlur" @on-focus="showPlaceHolder=false;" v-model="inputModelCopy" @on-click="inputIconClick" :icon="inputIcon" @on-enter="enter" :placeholder="placeholder">
+        <Button type="primary" v-show="btnText" slot="append" @click.native="btnClick">{{btnText}}</Button>
+        <Button type="primary" v-show="btnIcon" slot="append" :icon="btnIcon" @click.native="btnClick"></Button>
+        <img v-show="type=='small'" slot="append" src="../../images/superRecord/search.png" height="16" width="16" @click="inputIconClick" />
+        </Input>
+        <span v-if="isIE9 && showPlaceHolder" class="placeholder" @click="$refs.searchInput.focus();">{{placeholder}}</span>
+    </div>
+</template>
+<script>
+    export default {
+        name: 'SearchInput',
+        props: {
+            btnIcon: [String],
+            btnText: [String],
+            btnClick: {
+                type: Function
+            },
+            enter: {
+                type: Function
+            },
+            inputIconClick: {
+                type: Function
+            },
+            inputIcon: [String],
+            placeholder: {
+                type: String,
+                default: '请输入简单的关键词，如姓名或身份证号或手机号'
+            },
+            inputModel: {
+                type: String
+            },
+            type: {
+                type: String,
+                default: 'small'
+            }
+        },
+        data() {
+            return {
+                isIE9: window.navigator.appVersion.indexOf('MSIE 9.0') > 0,
+                showPlaceHolder: true
+            }
+        },
+        methods: {
+            onInputChange(e) {
+                this.$emit('update:inputModel', e.target.value);
+            },
+            onBlur() {
+                if(!this.inputModelCopy) {
+                    this.showPlaceHolder = true;
+                }
+            },
+            onClick() {
+                this.showPlaceHolder = false;
+                this.$refs.searchInput.focus();
+            }
+        },
+        computed: {
+            inputModelCopy: {
+                get() {
+                    return this.inputModel;
+                },
+                set() {}
+            }
+        }
+    }
+
+</script>

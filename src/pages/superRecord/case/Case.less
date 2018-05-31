@@ -1,0 +1,188 @@
+@import '../../../style/mixins';
+@border-color: #cee0f0;
+
+#caseRecord {
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+    background: #fff;
+
+    .layout-left {
+        float: left;
+        overflow: hidden;
+        width: 232px;
+        height: 100%;
+        position: relative;
+        border: 1px solid @border-color;
+        background: #f7faff;
+
+        .tree-title {
+            width: 100%;
+            height: 40px;
+            font-size: 16px;
+            line-height: 40px;
+            position: absolute;
+            z-index: 1000;
+            text-indent: 20px;
+            color: #666;
+            border-bottom: 1px solid @border-color;
+            .vertical-gradient(#ffffff, #eff6ff);
+        }
+
+        .tree-wrapper {
+            overflow: auto;
+            height: 100%;
+            padding: 50px 20px 10px;
+            position: relative;
+            .custom-scroll;
+
+            .ivu-tree {
+                /deep/ ul {
+                    font-size: 14px;
+
+                    li {
+                        margin: 0;
+                    }
+
+                }
+
+                /deep/.ivu-tree-empty {
+                    text-align: center;
+                }
+
+                /deep/ .selectNodeBg,
+                /deep/ .hoverNodeBg {
+                    background-color: #d3ebff !important;
+                }
+
+                /deep/ .ivu-tree-arrow {
+                    position: relative;
+                    z-index: 100 !important;
+                }
+
+                /deep/ .fontColor,
+                /deep/ .hoverFontColor {
+                    color: #0394f9 !important;
+                }
+
+            }
+
+        }
+
+    }
+
+    .layout-right {
+        height: 100%;
+        margin: 0 10px 10px 242px;
+        padding: 47px 0 86px;
+        position: relative;
+
+        .layout-content-head {
+            overflow: hidden;
+            width: 100%;
+            height: 47px;
+            position: absolute;
+            z-index: 20;
+            top: 0;
+            border: 1px solid @border-color;
+            .vertical-gradient(#ffffff, #eff6ff);
+
+            .cmp-search-input {
+                width: 250px;
+                margin: 7px 20px;
+            }
+
+            .list-mode-btn {
+                float: right;
+                width: 63px;
+                height: 100%;
+                font-size: 18px;
+                line-height: 47px;
+                cursor: pointer;
+                text-align: center;
+                border-left: 1px solid @border-color;
+
+                &.active {
+                    color: #3875d7;
+                    background: #fff;
+                }
+
+            }
+
+        }
+
+        .layout-content-main {
+            overflow: auto;
+            height: 100%;
+            position: relative;
+            background: #fff;
+            .custom-scroll;
+
+            h3 {
+                padding-top: 100px;
+                text-align: center;
+            }
+
+            .list-record {
+                h3 {
+                    height: 42px;
+                    padding: 0;
+                    font-size: 16px;
+                    font-weight: normal;
+                    line-height: 42px;
+                    text-align: left;
+                    text-indent: 20px;
+                    color: #2b3646;
+                    border-width: 0 1px;
+                    border-style: solid;
+                    border-color: #cee0f0;
+                    background-color: #f7faff;
+                }
+
+                .ivu-table-wrapper {
+                    width: 100%;
+
+                    /deep/ .ivu-table-cell {
+                        .btn-wrapper {
+                            &.active {
+                                padding: 5px 0;
+
+                                .ivu-btn {
+                                    width: 28px !important;
+                                    height: 28px !important;
+                                    border-radius: 4px;
+                                    background: #109af9 url('../../../images/superRecord/detail-active.png') center no-repeat !important;
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        .ivu-page {
+            width: 100%;
+            height: 66px;
+            padding: 20px 15px;
+            position: absolute;
+            z-index: 9;
+            right: 0;
+            bottom: 0;
+            text-align: right;
+            background-color: #fff;
+
+            /deep/ .ivu-select-dropdown {
+                top: -120px !important;
+            }
+
+        }
+
+    }
+
+}

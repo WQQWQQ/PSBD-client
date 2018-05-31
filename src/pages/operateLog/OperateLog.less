@@ -1,0 +1,68 @@
+@import '../../style/mixins';
+
+#operateLog {
+    height: 100%;
+    padding: 72px 20px 76px;
+    position: relative;
+    background-color: #fff;
+
+    .top-form {
+        width: 100%;
+        padding: 20px;
+        position: absolute;
+        z-index: 9;
+        top: 0;
+        left: 0;
+
+        label {
+            font-size: 14px;
+        }
+
+        .ivu-date-picker,
+        .ivu-input-wrapper {
+            margin-right: 15px;
+
+            /deep/ .ivu-input {
+                font-size: 12px;
+            }
+
+        }
+
+        .ipInput {
+            width: 120px;
+        }
+
+        .contentInput {
+            width: 200px;
+        }
+
+        .userInput {
+            width: 100px;
+        }
+
+    }
+
+    .table-wrapper {
+        overflow: auto;
+        height: 100%;
+        .custom-scroll;
+    }
+
+    .ivu-page {
+        width: 100%;
+        height: 66px;
+        padding: 20px 15px;
+        position: absolute;
+        z-index: 9;
+        bottom: 0;
+        left: 0;
+        text-align: right;
+        background-color: #fff;
+
+        /deep/ .ivu-select-dropdown {
+            top: -120px !important;
+        }
+
+    }
+
+}

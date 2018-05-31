@@ -1,0 +1,374 @@
+@import '../../style/mixins';
+@border-color: #cee0f0;
+
+.person-detail-modal {
+    height: 100%;
+
+    /deep/ .ivu-modal {
+        max-width: 800px !important;
+        max-height: 808px !important;
+
+        .ivu-modal-content {
+            .ivu-modal-close:hover {
+                background-color: rgba(0, 0, 0, .2);
+            }
+
+        }
+
+        .bm-head {
+            height: 33px;
+            font-size: 14px;
+            line-height: 33px;
+            text-indent: 15px;
+            color: #2b3646;
+            border-bottom: 1px solid @border-color;
+            background-color: #f7faff;
+        }
+
+        .basicMsg-div {
+            .basicMsg {
+                padding: 10px 20px;
+                position: relative;
+
+                .bm-left {
+                    width: 100%;
+                    height: 100%;
+                    padding-right: 250px;
+
+                    p {
+                        overflow: hidden;
+                        height: 33px;
+                        line-height: 33px;
+                        color: #68778c;
+
+                        &.dashed-p {
+                            height: 0;
+                            margin: 5px 20px 2px 0;
+                            border-bottom: 1px dashed #d0e1f1;
+                        }
+
+                        span {
+                            float: left;
+                            width: 50%;
+                            .text-overflow;
+
+                            i {
+                                font-style: normal;
+
+                                &:nth-child(even) {
+                                    color: #2b3646;
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                .bm-right {
+                    width: 250px;
+                    height: 100%;
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+
+                    .avatar {
+                        width: 251px;
+                        height: 306px;
+
+                        &.avatar-default {
+                            background: #efefef url('../../images/superRecord/people-default.png') center no-repeat;
+                        }
+
+                    }
+
+                    .personType {
+                        position: absolute;
+                        top: 5px;
+                        left: 5px;
+
+                        li {
+                            margin-bottom: 5px;
+                            color: #e58884;
+
+                            span {
+                                display: inline-block;
+                                padding: 0 5px;
+                                line-height: 22px;
+                                border: 1px solid #e58884;
+                                border-radius: 3px;
+                                background: #fae5e3;
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        .common-div {
+            overflow: hidden;
+            position: relative;
+
+            .bm-head {
+                border-width: 1px 0;
+                border-style: solid;
+                border-color: @border-color;
+            }
+
+            .p-div {
+                padding: 10px 20px;
+
+                div {
+                    border-bottom: 1px dashed @border-color;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                }
+
+                p {
+                    overflow: hidden;
+                    height: 34px;
+                    line-height: 34px;
+                    color: #68778c;
+
+                    span {
+                        float: left;
+                        .text-overflow;
+
+                        i {
+                            font-style: normal;
+
+                            &:nth-child(even) {
+                                color: #2b3646;
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        .importantLogo-div {
+            .p-div {
+                div:last-of-type {
+                    border: none;
+                }
+
+            }
+
+        }
+
+        .caseMsg-div {
+            .caseList {
+                span {
+                    width: 25%;
+                }
+
+            }
+
+            .no-Msg {
+                padding: 10px 0 15px;
+                font-size: 13px;
+                font-weight: bold;
+                text-indent: 20px;
+                color: #2b3646;
+            }
+
+        }
+
+        .residentInfo-div,
+        .drugInfo-div,
+        .drugRelatedInfo-div {
+            span {
+                width: 25%;
+            }
+
+        }
+
+        .importantLogo-div,
+        .marriage-div,
+        .importantInfo-div,
+        .suspectList-div,
+        .flowInfo-div {
+            span {
+                width: 33.3%;
+            }
+
+        }
+
+        .modal-body {
+            overflow: hidden;
+            padding-left: 1px;
+            font-size: 14px;
+
+            .modal-body-top {
+                position: relative;
+
+                .bm-head {
+                    border-width: 1px 0;
+                    border-style: solid;
+                    border-color: @border-color;
+                }
+
+                .category-list {
+                    overflow: hidden;
+                    padding: 15px 0;
+                    border-bottom: 1px dashed @border-color;
+
+                    li {
+                        float: left;
+                        overflow: hidden;
+                        width: 20%;
+                        font-size: 14px;
+                        line-height: 40px;
+                        text-align: center;
+                        border-right: 1px solid #e9e9e9;
+
+                        &:last-child {
+                            border-right: none;
+                        }
+
+                        .category {
+                            height: 20px;
+                            font-size: 14px;
+                            line-height: 20px;
+                            color: #2b3646;
+                            .text-overflow;
+                        }
+
+                        .count {
+                            height: 20px;
+                            font-size: 24px;
+                            line-height: 20px;
+                            color: #fe3232;
+                            .text-overflow;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            .modal-body-bottom {
+                overflow: auto;
+                padding: 15px;
+
+                .no-Msg {
+                    margin-top: 35px;
+                    padding: 10px 0 15px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    text-indent: 20px;
+                    color: #2b3646;
+                }
+
+                .analyse-table {
+                    width: 100%;
+
+                    .table-body {
+                        overflow: auto;
+                        max-height: 200px;
+                        border-bottom: 1px solid @border-color;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        cursor: pointer;
+                        text-align: center;
+                        border: 1px solid @border-color;
+
+                        &.tab2 {
+                            border-top: none;
+                            border-bottom: none;
+                        }
+
+                        tr {
+                            height: 30px;
+                            background: #eff6ff;
+
+                            th {
+                                padding: 0 5px;
+                                border-right: 1px solid @border-color;
+
+                                &:first-child {
+                                    width: 142px;
+                                }
+
+                                &:nth-child(2) {
+                                    width: 74px;
+                                    padding: 0 5px;
+                                }
+
+                                &:last-child {
+                                    padding: 0 15px;
+                                    text-align: left;
+                                }
+
+                            }
+
+                        }
+
+                        tr {
+                            height: 40px;
+
+                            td {
+                                padding: 0 5px;
+                                font-size: 12px;
+                                border-right: 1px solid @border-color;
+
+                                &:first-child {
+                                    width: 142px;
+                                    color: #3aa8fa;
+                                }
+
+                                &:nth-child(2) {
+                                    width: 74px;
+                                }
+
+                                &:last-child {
+                                    padding: 0 15px;
+                                    text-align: left;
+                                }
+
+                                span:nth-child(even) {
+                                    color: #3aa8fa;
+                                }
+
+                            }
+
+                            &:nth-child(even) {
+                                background: #f7faff;
+                            }
+
+                            &:hover {
+                                background: #d3ebff;
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+}

@@ -1,0 +1,143 @@
+@import '../../style/mixins';
+
+.car-detail-modal {
+    /deep/ .ivu-modal {
+        max-width: 900px !important;
+        max-height: 808px !important;
+
+        .ivu-modal-content {
+            .ivu-modal-close:hover {
+                background-color: rgba(0, 0, 0, .2);
+            }
+
+            .ivu-modal-header {
+                border-radius: 4px 4px 0 0;
+            }
+
+            .ivu-modal-footer {
+                border-radius: 0 0 4px 4px;
+            }
+
+        }
+
+        section {
+            &:first-child {
+                .bm-head {
+                    border-top: none !important;
+                }
+
+            }
+
+            .bm-head {
+                height: 35px;
+                font-size: 14px;
+                line-height: 35px;
+                text-indent: 15px;
+                color: #2b3646;
+                border-width: 1px 0;
+                border-style: solid;
+                border-color: #cee0f0;
+                background-color: #f7faff;
+            }
+
+            .info-wrapper {
+                padding: 10px 20px 0px;
+
+                .dashed-line {
+                    margin-top: 10px;
+                    border-top: 1px dashed #cee0f0;
+                }
+
+                &:last-of-type {
+                    .dashed-line {
+                        border: none;
+                    }
+
+                }
+
+                p {
+                    overflow: hidden;
+                    height: 28px;
+                    line-height: 28px;
+                    color: #68778c;
+
+                    span {
+                        float: left;
+                        width: 33.3%;
+                        .text-overflow;
+                    }
+
+                    i {
+                        font-style: normal;
+
+                        &:nth-child(even) {
+                            color: #2b3646;
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        .car-modal-top {
+            overflow: hidden;
+
+            .img-wrapper {
+                float: right;
+                width: 407px;
+                height: 334px;
+                padding: 20px;
+                position: relative;
+                border-left: 1px solid #cee0f0;
+
+                .avatar {
+                    width: 100%;
+                    height: 100%;
+
+                    &.avatar-default {
+                        background: #eff6ff url('../../images/superRecord/car-default.png') center no-repeat;
+                    }
+
+                }
+
+                .breakRawReport {
+                    position: absolute;
+                    top: 25px;
+                    left: 25px;
+
+                    li {
+                        margin-bottom: 10px;
+                        color: #e58884;
+
+                        span {
+                            display: inline-block;
+                            padding: 0 5px;
+                            line-height: 22px;
+                            border: 1px solid #e58884;
+                            border-radius: 3px;
+                            background: #fae5e3;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            .msg-wrapper {
+                margin-right: 407px;
+
+                span {
+                    width: 50%;
+                }
+
+            }
+
+        }
+
+    }
+
+}
