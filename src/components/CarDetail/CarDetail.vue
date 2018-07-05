@@ -147,21 +147,18 @@
             <Button v-show="id" type="success" @click="exportData">导出</Button>
             <Button v-show="id" type="success" @click="print">打印</Button>
         </div>
-        <Spin fix v-show="spin">
-            <Icon type="load-c" size="18" class="demo-spin-icon-load"></Icon>
-            <div>加载中...</div>
-        </Spin>
+        <Spin fix v-show="spin"></Spin>
     </Modal>
 </template>
 <script>
     import {
         exportWordData
     }
-    from '../../services/getData';
+    from '@/services/getData';
     import {
         deepCopy
     }
-    from '../../services/utils';
+    from '@/services/utils';
     export default {
         name: 'CarDetail',
         props: {
@@ -202,14 +199,11 @@
             },
             exportData() {
                 let data=deepCopy(this.data);
-                Reflect.deleteProperty(data,"defaultSrc");
-                Reflect.deleteProperty(data,"CONTEXT");
-                Reflect.deleteProperty(data,"cltpdz");
+                ["defaultSrc","CONTEXT","cltpdz"].map(val => Reflect.deleteProperty(data, val));
                 data.breakRawRecordList=this.breakRawRecordList;
-                exportWordData(this.type,this.id,{},JSON.stringify(data),{});
-                /*this.$http(exportWordData(this.type, this.id, {},data, {}), res => {
-                    console.log(res);
-                });*/
+                exportWordData(this.type,this.id,{
+                    carDetail:JSON.stringify(data)
+                });
             },
             print() {
                 window.print && window.print();

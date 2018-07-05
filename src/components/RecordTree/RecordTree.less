@@ -1,0 +1,41 @@
+@deep: ~'>>>';
+.ivu-tree {
+    @{deep} ul {
+        font-size: 14px;
+
+        li {
+            margin: 0;
+            .tree-node-wrapper{
+                position:relative;
+                display: inline-block;
+                width: 100%;
+                height: 30px;
+                line-height: 30px;
+                cursor: pointer;
+                .tree-node-bg{
+                    position:absolute;
+                    width:300px;
+                    height: 30px;
+                    right: -4px;
+                    top: 5px;
+                }
+                .tree-node-content{
+                    position: relative;
+                    padding: 5px 5px 5px 24px;
+                    z-index: 5;
+                }
+            }
+        }
+
+    }
+
+    @{deep}.ivu-tree-empty {
+        text-align: center;
+    }
+
+    @{deep} .ivu-tree-arrow {
+        position: relative;
+        z-index: 100 !important;
+    }
+
+}

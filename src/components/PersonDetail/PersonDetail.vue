@@ -48,7 +48,7 @@
                     </p>
                 </div>
                 <div class="bm-right">
-                    <img v-if="data.jurisdictionalUnit.rytpdz || data.jurisdictionalUnit.RYTPDZ" :src="data.jurisdictionalUnit.rytpdz||data.jurisdictionalUnit.RYTPDZ" class="avatar" @error="data.jurisdictionalUnit.rytpdz=data.jurisdictionalUnit.RYTPDZ='';">
+                    <img v-if="data.jurisdictionalUnit.rytpdz || data.jurisdictionalUnit.RYTPDZ || data.jurisdictionalUnit.ajtpdz || data.jurisdictionalUnit.AJTPDZ" :src="data.jurisdictionalUnit.rytpdz||data.jurisdictionalUnit.RYTPDZ || data.jurisdictionalUnit.ajtpdz || data.jurisdictionalUnit.AJTPDZ" class="avatar" @error="data.jurisdictionalUnit.rytpdz=data.jurisdictionalUnit.RYTPDZ=data.jurisdictionalUnit.AJTPDZ=data.jurisdictionalUnit.ajtpdz='';">
                     <div v-else class="avatar avatar-default"></div>
                     <ul class="personType">
                         <li v-for="(item,index) in data.personTypes||personTypeSelect" :key="index"><span>{{item}}</span></li>
@@ -310,10 +310,7 @@
             <Button v-if="id" type="success" @click="exportData">导出</Button>
             <Button v-if="id" type="success" @click="print">打印</Button>
         </div>
-        <Spin fix v-show="spin">
-            <Icon type="load-c" size="18" class="demo-spin-icon-load"></Icon>
-            <div>加载中...</div>
-        </Spin>
+        <Spin fix v-show="spin"></Spin>
     </Modal>
 </template>
 <script>
@@ -321,11 +318,11 @@
         deepCopy,
         serialize
     }
-    from '../../services/utils';
+    from '@/services/utils';
     import {
         exportWordData
     }
-    from '../../services/getData';
+    from '@/services/getData';
     export default {
         name: 'PersonDetail',
         props: {
@@ -387,11 +384,11 @@
             },
             exportData() {
                 let data = deepCopy(this.data);
-                Reflect.deleteProperty(data.jurisdictionalUnit, "defaultSrc");
-                Reflect.deleteProperty(data.jurisdictionalUnit, "CONTEXT");
-                Reflect.deleteProperty(data.jurisdictionalUnit, "rytpdz");
+                ["defaultSrc","CONTEXT","rytpdz"].map(val => Reflect.deleteProperty(data.jurisdictionalUnit, val));
                 data.personTypeSelect = this.personTypeSelect;
-                exportWordData(this.type,this.id,JSON.stringify(data),{},{});
+                exportWordData(this.type,this.id,{
+                    personDetail:JSON.stringify(data)
+                });
             },
             print() {
                 window.print && window.print();

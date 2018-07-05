@@ -5,7 +5,7 @@ const library = '[name]_lib';
 
 module.exports = {
   entry: {
-    vendors: ['vue','vue-router','vuex','axios','iview','echarts','lodash']
+    vendors: ['vue','vue-router','axios','iview','echarts','babel-polyfill','es6-promise']
   },
   output: {
     filename: '[name].dll.js',
@@ -16,8 +16,8 @@ module.exports = {
   plugins: [
     new webpack.DllPlugin({
       path: path.join(__dirname, '[name]-manifest.json'),
-      // This must match the output.library option above
-      name: library
+      name: library,
+      context: __dirname
     }),
   ],
 };

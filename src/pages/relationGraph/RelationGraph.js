@@ -1,38 +1,39 @@
-import carCrimeSrc from '../../images/relationGraph/car-crime.png';
-import carKeySrc from '../../images/relationGraph/car-key.png';
-import carDrugSrc from '../../images/relationGraph/car-drug.png';
-import cardCrimeSrc from '../../images/relationGraph/card-crime.png';
-import cardKeySrc from '../../images/relationGraph/card-key.png';
-import cardDrugSrc from '../../images/relationGraph/card-drug.png';
-import phoneCrimeSrc from '../../images/relationGraph/phone-crime.png';
-import phoneKeySrc from '../../images/relationGraph/phone-key.png';
-import phoneDrugSrc from '../../images/relationGraph/phone-drug.png';
+import carCrimeSrc from '@/images/relationGraph/car-crime.png';
+import carKeySrc from '@/images/relationGraph/car-key.png';
+import carDrugSrc from '@/images/relationGraph/car-drug.png';
+import cardCrimeSrc from '@/images/relationGraph/card-crime.png';
+import cardKeySrc from '@/images/relationGraph/card-key.png';
+import cardDrugSrc from '@/images/relationGraph/card-drug.png';
+import phoneCrimeSrc from '@/images/relationGraph/phone-crime.png';
+import phoneKeySrc from '@/images/relationGraph/phone-key.png';
+import phoneDrugSrc from '@/images/relationGraph/phone-drug.png';
+import markerPng from '@/images/relationGraph/marker.png';
 
-import markerPng from '../../images/relationGraph/marker.png';
+import SearchInput from '@/components/SearchInput/SearchInput';
+import AnalyseDetail from '@/components/AnalyseDetail/AnalyseDetail';
 import esriLoader from 'esri-loader';
 import {
     getRelation,
     getCallRecordByPhoneNumber,
     getActivityDirectory,
     getPeerAnalysisByIdentityCard,
-    getActivitySequence,
-    getAirPeerRecordList,
-    getStayPeerRecordList,
-    getTrainPeerRecordList,
-    getInternetPeerRecordList
+    getActivitySequence
+    // getAirPeerRecordList,
+    // getStayPeerRecordList,
+    // getTrainPeerRecordList,
+    // getInternetPeerRecordList
 }
-from '../../services/getData';
+from '@/services/getData';
 
 import {
-    setStore,
-    getStore,
-    removeStore,
+    // setStore,
+    // getStore,
+    // removeStore,
     deepCopy,
     addEvent,
-    trim,
     throttle
 }
-from '../../services/utils';
+from '@/services/utils';
 
 import {
     GRAPH_PERSON_DESC,
@@ -60,19 +61,24 @@ import {
     curveLineStyle,
     activityList
 }
-from '../../config/baseConfig';
+from '@/config/baseConfig';
 
 const headerHeight = 50;
 const footerHeight = 30;
 const nodeDetailTitleHeight = 35;
 const docEle = document.documentElement || document.body;
 
-let mapPromise, graph;
+let mapPromise, graph, GisObject;
 let endDate = new Date().Format('yyyy-MM-dd hh:mm:ss');
 let startDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000 * 7).Format('yyyy-MM-dd hh:mm:ss');
 export default {
+    components: {
+        SearchInput,
+        AnalyseDetail
+    },
     data() {
         return {
+            currentRow: {},
             searchListShow: true,
             btnIcon: 'ios-search-strong',
             btnText: '',
@@ -89,10 +95,8 @@ export default {
             nodeDetailTopShow: false,
             nodeDetailTopHeight: 0,
             showRules: false,
-            selectRow: {},
             childrenVisible: false,
             timeout: null,
-            dateEditable: false,
             rootNode: {},
             allActivity: [],
             activity: activityList[0].value,
@@ -162,14 +166,14 @@ export default {
     },
     watch: {
         mapShow(show) {
-            if(show && !this.GisObject) {
+            if (!GisObject && show) {
                 mapPromise.then(([MapInitObject]) => {
-                    this.GisObject = new MapInitObject("map", {
+                    GisObject = new MapInitObject("map", {
                         minZoom: 1,
                         nav: false,
                         slider: false
                     });
-                    this.GisObject.addDefaultLayers();
+                    GisObject.addDefaultLayers();
                     this.addGraphic();
                 });
             }
@@ -178,8 +182,8 @@ export default {
     methods: {
         clearSearchList() {
             let arr = [];
-            for(let i of this.searchList) {
-                if(i.rootNode.gmsfhm == this.rootNode.gmsfhm) {
+            for (let i of this.searchList) {
+                if (i.rootNode.gmsfhm == this.rootNode.gmsfhm) {
                     arr.push(i);
                     break;
                 }
@@ -187,70 +191,70 @@ export default {
             this.searchList = arr;
         },
         addGraphic() {
-            if(this.GisObject) {
-                let layer = this.GisObject.map.getLayer('layer');
-                if(!layer) {
+            if (GisObject) {
+                const { jd, wd } = this.currentRow;
+                let layer = GisObject.map.getLayer('layer');
+                if (!layer) {
                     layer = new esri.layers.GraphicsLayer({
                         id: 'layer'
                     });
-                    this.GisObject.map.addLayer(layer);
+                    GisObject.map.addLayer(layer);
                 }
-                layer.clear();
-                let point = new esri.geometry.Point(this.selectRow.jd, this.selectRow.wd);
-                this.GisObject.map.centerAndZoom(point, 5).then(() => {
+                let point = new esri.geometry.Point(jd, wd);
+                let graphic = layer.graphics[0];
+                if (graphic) {
+                    graphic.setGeometry(point);
+                } else {
                     layer.add(new esri.Graphic(point, new esri.symbol.PictureMarkerSymbol({
                         url: markerPng,
                         height: 32,
                         width: 30,
                         type: "esriPMS"
                     })));
-                });
+                }
+                GisObject.map.centerAndZoom(point, 5);
             }
         },
         searchActivity() {
-            if(this.graphDatas[this.selectNodeIndex]) {
-                let idCard = this.graphDatas[this.selectNodeIndex].data.gmsfhm;
-                this.$http(getActivityDirectory(idCard, this.hdStartDate, this.hdEndDate), (res) => {
-                    this.activityType = res.data || [];
-                    if(!res.code) {
-                        this.analyseModalPersonName = this.graphDatas[this.selectNodeIndex].data.xm;
-                        this.$http(getActivitySequence(idCard, +this.activity, this.hdStartDate, this.hdEndDate), res => {
+            let selectedNode = this.graphDatas[this.selectNodeIndex];
+            if (selectedNode) {
+                let idCard = selectedNode.data.gmsfhm;
+                getActivityDirectory(idCard, this.hdStartDate, this.hdEndDate).then(res => {
+                    const { data = [], code } = res;
+                    this.activityType = data;
+                    if (!code) {
+                        this.analyseModalPersonName = selectedNode.data.xm;
+                        getActivitySequence(idCard, +this.activity, this.hdStartDate, this.hdEndDate).then(res => {
                             this.activitySequence = res.data || [];
-                            if(!res.code) {
+                            if (!res.code) {
                                 this.activityModal = true;
                             }
-                        }, err => {
-                            this.$Message.error('网络错误');
-                        });
+                        }).catch(e => console.error(e));
                     }
-                }, (err) => {
-                    this.$Message.error('网络错误');
-                });
+                })
             }
         },
         toggleChildNode() {
             this.contextmenuShow = false;
-            let node = this.graphDatas[this.selectNodeIndex];
-            if(node.hasClick) {
-                let selectNode = this.graphDatas[this.selectNodeIndex];
+            let selectNode = this.graphDatas[this.selectNodeIndex];
+            if (selectNode.hasClick) {
                 let isShow = !selectNode.childrenVisible;
                 let childrenIndexList = this.getAllIndexFromNodeIndexTree(this.findNodeIndexTree(this.nodeIndexTree, this.selectNodeIndex), []);
-                for(let i = 0, len = this.graphDatas.length; i < len; i++) {
+                for (let i = 0, len = this.graphDatas.length; i < len; i++) {
                     let data = this.graphDatas[i];
-                    if(childrenIndexList.indexOf(+data.index) > -1) {
+                    if (childrenIndexList.indexOf(+data.index) > -1) {
                         data.itemStyle = isShow ? normalNodeStyle : hiddenNodeStyle;
                         data.visible = isShow;
                     }
                 }
-                for(let i = 0, len = this.graphEdges.length; i < len; i++) {
+                for (let i = 0, len = this.graphEdges.length; i < len; i++) {
                     let data = this.graphEdges[i];
                     let personType = +data.personType;
-                    if(data.source == this.selectNodeIndex || childrenIndexList.indexOf(+data.source) > -1 || childrenIndexList.indexOf(+data.target) > -1) {
-                        if(isShow) {
+                    if (data.source == this.selectNodeIndex || childrenIndexList.indexOf(+data.source) > -1 || childrenIndexList.indexOf(+data.target) > -1) {
+                        if (isShow) {
                             data.lineStyle = deepCopy(normalLineStyle);
                             data.lineStyle.normal.color = data.lineStyle.emphasis.color = GRAPH_COLOR[personType];
-                        }
-                        else {
+                        } else {
                             data.lineStyle = hiddenLineStyle;
                         }
                         data.label = isShow ? normalEdgeLabelStyle : hiddenEdgeLabelStyle;
@@ -258,43 +262,40 @@ export default {
                 }
                 selectNode.childrenVisible = isShow;
                 this.setGraphOptions();
-            }
-            else {
-                this.getRelation(node.data.gmsfhm, node.index);
+            } else {
+                this.getRelation(selectNode.data.gmsfhm, selectNode.index);
             }
         },
         findNodeIndexTree(nodeIndexTree, index) {
-            if(!nodeIndexTree || isNaN(index) || index < 0) return false;
-            for(let i in nodeIndexTree) {
-                if(i == index) {
+            if (!nodeIndexTree || isNaN(index) || index < 0) return false;
+            for (let i in nodeIndexTree) {
+                if (i == index) {
                     return nodeIndexTree[i];
-                }
-                else {
+                } else {
                     let obj = this.findNodeIndexTree(nodeIndexTree[i], index);
-                    if(obj) {
+                    if (obj) {
                         return obj;
                     }
                 }
             }
         },
         getAllIndexFromNodeIndexTree(nodeIndexTree, arr) {
-            for(let i in nodeIndexTree) {
-                if(arr.indexOf(i) < 0) {
+            for (let i in nodeIndexTree) {
+                if (arr.indexOf(i) < 0) {
                     arr.push(+i);
                 }
                 arr = arr.concat(this.getAllIndexFromNodeIndexTree(nodeIndexTree[i], []));
             }
             return arr;
         },
-        locateMap(currentRow, index) {
-            this.selectRow = currentRow;
-            if(currentRow.jd && currentRow.wd) {
+        locateMap(row, index) {
+            this.currentRow = row;
+            if (row.jd && row.wd) {
                 this.mapShow = true;
                 this.$nextTick(() => {
                     this.addGraphic();
                 });
-            }
-            else {
+            } else {
                 this.mapShow = false;
             }
         },
@@ -309,41 +310,23 @@ export default {
             this.txEndDate = date;
         },
         searchAccompany() {
-            if(!this.txStartDate) {
-                this.$Message.warning('请选择开始时间');
-                return;
-            }
-            if(!this.txEndDate) {
-                this.$Message.warning('请选择结束时间');
-                return;
-            }
-            if(new Date(this.txStartDate) > new Date(this.txEndDate)) {
-                this.$Message.warning('开始时间不得大于结束时间');
-                return;
-            }
-            if(!this.frequency) {
-                this.$Message.warning('请选择同行频次');
-                return;
-            }
-            if(!this.txType || this.txType.length <= 0) {
-                this.$Message.warning('请选择同行方式');
-                return;
-            }
+            if (!this.txStartDate) return this.$Message.warning('请选择开始时间');
+            if (!this.txEndDate) return this.$Message.warning('请选择结束时间');
+            if (new Date(this.txStartDate) > new Date(this.txEndDate)) return this.$Message.warning('开始时间不得大于结束时间');
+            if (!this.frequency) return this.$Message.warning('请选择同行频次');
+            if (!this.txType || this.txType.length <= 0) return this.$Message.warning('请选择同行方式');
             this.$Spin.show();
-            this.rootNode && this.$http(getPeerAnalysisByIdentityCard(this.rootNode.gmsfhm, this.txStartDate, this.txEndDate, this.frequency, this.txType.join(',')), res => {
+            this.rootNode && getPeerAnalysisByIdentityCard(this.rootNode.gmsfhm, this.txStartDate, this.txEndDate, this.frequency, this.txType.join(',')).then(res => {
                 this.$Spin.hide();
-                let data = res.data;
-                if(!res.code && data && data.links) {
+                const { code, data } = res;
+                if (!code && data && data.links) {
                     this.clearAccompanyEdge();
                     this.setGraphData(data);
                 }
-                else {
-                    this.$Message.info('暂无数据');
-                }
-            }, err => {
+            }).catch(e => {
                 this.$Spin.hide();
-                this.$Message.error('网络错误');
-            });
+                console.error(e);
+            })
             setTimeout(() => {
                 this.$Spin.hide();
             }, 15000);
@@ -357,42 +340,36 @@ export default {
             this.hideIconClass = !this.searchText;
         },
         showEdgeDetailPanel(edge) {
-            if(edge && edge.data) {
-                this.bids = edge.data;
-                this.analyseModalPersonName = `${this.graphDatas[+edge.source].data.xm} - ${this.graphDatas[+edge.target].data.xm}`;
+            let { source, target, data } = edge;
+            if (edge && data) {
+                this.bids = data;
+                this.analyseModalPersonName = `${this.graphDatas[+source].data.xm} - ${this.graphDatas[+target].data.xm}`;
                 this.accompanyModal = true;
             }
         },
         showNodeDetailPanel(node) {
-            if(!node || !node.data) return;
+            if (!node || !node.data) return;
             this.nodeDetailShow = true;
             this.$nextTick(() => {
                 let type = node.data.type;
                 this.hideTableHeader = type != GRAPH_NODE_TYPE.PHONE;
-                this.nodeDetailTitle = type == GRAPH_NODE_TYPE.PHONE ? '通话记录' : graphNodeCategories[node.category].name + '信息';
+                this.nodeDetailTitle = type == GRAPH_NODE_TYPE.PHONE ? '通话记录' : `${graphNodeCategories[node.category].name}信息`;
                 this.nodeDetailData = [];
                 this.nodeDetailColumns = [];
                 this.mapShow = false;
-                if(this.isPhoneDetail) {
-                    if(node.data && node.data.phoneRecord) {
+                if (this.isPhoneDetail) {
+                    if (node.data && node.data.phoneRecord) {
                         this.createPhoneRecord(node.data.phoneRecord);
-                    }
-                    else {
-                        this.$http(getCallRecordByPhoneNumber(node.data.phoneNumber), res => {
-                            let data = res.data || [];
-                            if(!res.code && data) {
+                    } else {
+                        getCallRecordByPhoneNumber(node.data.phoneNumber).then(res => {
+                            const { code, data } = res;
+                            if (!code && data) {
                                 this.graphDatas[node.index].data.phoneRecord = data;
                                 this.createPhoneRecord(data);
                             }
-                            else {
-                                this.$Message.info('暂无数据');
-                            }
-                        }, err => {
-                            this.$Message.error('网络错误');
-                        });
+                        }).catch(e => console.error(e));
                     }
-                }
-                else {
+                } else {
                     this.nodeDetailColumns = [{
                         key: 'name',
                         title: '',
@@ -403,7 +380,7 @@ export default {
                         align: 'left'
                     }];
                     let fieldMap;
-                    switch(type) {
+                    switch (type) {
                         case GRAPH_NODE_TYPE.PERSON:
                             fieldMap = personFieldMap;
                             break;
@@ -417,8 +394,8 @@ export default {
                             fieldMap = bankFieldMap;
                             break;
                     }
-                    for(let i in fieldMap) {
-                        if(node.data[i]) {
+                    for (let i in fieldMap) {
+                        if (node.data[i]) {
                             this.nodeDetailData.push({
                                 name: `${fieldMap[i]}：`,
                                 value: node.data[i]
@@ -429,7 +406,7 @@ export default {
             });
         },
         createPhoneRecord(data) {
-            if(data && data.length > 0) {
+            if (data && data.length > 0) {
                 this.nodeDetailColumns = [{
                     align: "center",
                     key: 'dfhm',
@@ -451,13 +428,13 @@ export default {
                     width: 75,
                     title: phoneFieldMap['thsc']
                 }];
-                for(let i = 0, len = data.length; i < len; i++) {
+                for (let i = 0, len = data.length; i < len; i++) {
                     let record = data[i];
                     this.nodeDetailData.push({
                         dfhm: record.dfhm,
                         hjlx: record.hjlx,
                         kssj: new Date(+record.kssj).Format('yyyy-MM-dd hh:mm:ss'),
-                        thsc: record.thsc + '分钟',
+                        thsc: `${record.thsc}分钟`,
                         jd: +record.jd,
                         wd: +record.wd
                     });
@@ -466,17 +443,17 @@ export default {
         },
         clearAccompanyEdge() {
             let nodeIndexArr = [];
-            for(let i = this.graphEdges.length - 1; i >= 0; i--) {
+            for (let i = this.graphEdges.length - 1; i >= 0; i--) {
                 let edge = this.graphEdges[i];
                 let {
                     source,
                     target
                 } = edge;
-                if(edge.type) {
+                if (edge.type) {
                     this.edgeNumMap[source] = +this.edgeNumMap[source] - 1;
-                    if(!this.edgeNumMap[source] || !this.graphDatas[source]) Reflect.deleteProperty(this.edgeNumMap, source);
+                    if (!this.edgeNumMap[source] || !this.graphDatas[source]) Reflect.deleteProperty(this.edgeNumMap, source);
                     this.edgeNumMap[target] = +this.edgeNumMap[target] - 1;
-                    if(!this.edgeNumMap[target] || !this.graphDatas[target]) Reflect.deleteProperty(this.edgeNumMap, target);
+                    if (!this.edgeNumMap[target] || !this.graphDatas[target]) Reflect.deleteProperty(this.edgeNumMap, target);
                     nodeIndexArr.indexOf(source) < 0 && nodeIndexArr.push(+source);
                     nodeIndexArr.indexOf(target) < 0 && nodeIndexArr.push(+target);
                     let targetArr = this.linkMap[+source];
@@ -484,20 +461,20 @@ export default {
                     this.graphEdges.splice(i, 1);
                 }
             }
-            for(let a = 0, len = nodeIndexArr.length; a < len; a++) {
+            for (let a = 0, len = nodeIndexArr.length; a < len; a++) {
                 let nodeIndex = nodeIndexArr[a];
-                if(!this.edgeNumMap[nodeIndex]) {
+                if (!this.edgeNumMap[nodeIndex]) {
                     let node = this.graphDatas[nodeIndex];
                     let nodeType = node.type;
                     let nodeId = node.data.id;
-                    if(this.nodeMap[nodeType][nodeId] == nodeIndex) Reflect.deleteProperty(this.nodeMap[nodeType], nodeId);
+                    if (this.nodeMap[nodeType][nodeId] == nodeIndex) Reflect.deleteProperty(this.nodeMap[nodeType], nodeId);
                     delete this.findNodeIndexTree(this.nodeIndexTree, nodeIndex);
                     this.graphDatas.splice(nodeIndex, 1);
                 }
             }
         },
         highlightNode(selectNodeIndex) {
-            if(this.graphDatas && this.graphDatas[this.selectNodeIndex]) {
+            if (this.graphDatas && this.graphDatas[this.selectNodeIndex]) {
                 this.graphDatas[this.selectNodeIndex].itemStyle = normalNodeStyle;
             }
             this.selectNodeIndex = selectNodeIndex;
@@ -518,61 +495,49 @@ export default {
             this.edgeNumMap = {};
         },
         search() {
-            this.searchText = trim(this.searchText);
-            if(!this.searchText) {
-                this.$Message.warning('请输入查询信息');
-                return;
-            }
+            if (!this.searchText) return this.$Message.warning('请输入查询信息');
             this.getRelation(this.searchText, undefined, true);
         },
         getRelation(searchText, index, isNewGraph) {
-            this.$http(getRelation(searchText), res => {
+            getRelation(searchText).then(res => {
                 this.clearText();
                 this.firstShow = false;
                 this.btnIcon = '';
                 this.btnText = "搜索";
                 this.$nextTick(() => {
-                    let {
-                        data,
-                        code
-                    } = res;
-                    if(!code && data) {
-                        if(index > -1) {
+                    const { data, code } = res;
+                    if (!code && data) {
+                        if (index > -1) {
                             let node = this.graphDatas[index];
                             node.hasClick = node.childrenVisible = true;
                         }
-                        if(data.nodes && data.nodes.length > 0) {
+                        if (data.nodes && data.nodes.length > 0) {
                             !graph && this.createGraph();
                             this.setGraphData(data, isNewGraph);
-                        }
-                        else {
+                        } else {
                             this.$Message.info('暂无数据');
                         }
-                    }
-                    else if(code == 99) { //搜名字出现重名
+                    } else if (code == 99) { //搜名字出现重名
                         this.peopleList = data;
-                    }
-                    else {
+                    } else {
                         this.$Message.info('暂无数据');
                     }
                 });
-            }, err => {
-                this.$Message.error('网络错误');
-            });
+            }).catch(e => console.error(e));
         },
         createGraph() {
             let graphDom = document.getElementById('graph');
-            if(!graphDom) return;
+            if (!graphDom) return;
             graphDom.oncontextmenu = () => false;
             graph = this.$eCharts.init(graphDom);
             graph.on('dblclick', params => {
                 this.timeout && clearTimeout(this.timeout);
                 let node = params.data;
-                if(node.visible) {
+                if (node.visible) {
                     this.highlightNode(node.index);
-                    if(params.dataType == 'node' && node && node.data) {
+                    if (params.dataType == 'node' && node && node.data) {
                         this.nodeDetailShow && this.showNodeDetailPanel(node);
-                        if(node.data.hasChildNode && node.data.gmsfhm) {
+                        if (node.data.hasChildNode && node.data.gmsfhm) {
                             this.toggleChildNode();
                         }
                     }
@@ -582,8 +547,8 @@ export default {
                 this.timeout && clearTimeout(this.timeout);
                 let data = params.data;
                 let dataType = params.dataType;
-                if(dataType == 'node') {
-                    if(data && data.visible) {
+                if (dataType == 'node') {
+                    if (data && data.visible) {
                         let type = data.data.type;
                         this.isPersonDetail = type == GRAPH_NODE_TYPE.PERSON;
                         this.isPhoneDetail = type == GRAPH_NODE_TYPE.PHONE;
@@ -593,8 +558,7 @@ export default {
                             this.showNodeDetailPanel(data);
                         }, 300);
                     }
-                }
-                else if(dataType == 'edge' && data) {
+                } else if (dataType == 'edge' && data) {
                     this.timeout = setTimeout(() => {
                         this.showEdgeDetailPanel(data);
                     }, 300);
@@ -603,9 +567,9 @@ export default {
             graph.on('contextmenu', params => {
                 this.contextmenuShow = false;
                 let node = params.data;
-                if(node.visible) {
+                if (node.visible) {
                     this.highlightNode(node.index);
-                    if(params.dataType == 'node' && params.data && params.data.type == GRAPH_NODE_TYPE.PERSON) {
+                    if (params.dataType == 'node' && params.data && params.data.type == GRAPH_NODE_TYPE.PERSON) {
                         this.contextmenuShow = true;
                         this.childrenVisible = node.childrenVisible;
                         this.contextmenuTop = params.event.offsetY;
@@ -615,9 +579,9 @@ export default {
             });
             graph.on('legendselectchanged', params => {
                 let name = params.name;
-                for(let i = 0, len = graphNodeCategories.length; i < len; i++) {
+                for (let i = 0, len = graphNodeCategories.length; i < len; i++) {
                     let category = graphNodeCategories[i];
-                    if(category.name == name) {
+                    if (category.name == name) {
                         this.graphNodeCategories[i].icon = params.selected[name] ? category.icon : category.iconBlur;
                         break;
                     }
@@ -630,10 +594,10 @@ export default {
                 nodes = [],
                     links = []
             } = data;
-            if(isNewGraph) {
+            if (isNewGraph) {
                 let rootNode = nodes[0] || {};
-                for(let i of this.searchList) {
-                    if(rootNode.gmsfhm == i.rootNode.gmsfhm) return;
+                for (let i of this.searchList) {
+                    if (rootNode.gmsfhm == i.rootNode.gmsfhm) return;
                 }
                 this.resetData();
             }
@@ -648,40 +612,35 @@ export default {
         },
         handleNodeData(nodes, isNewGraph) {
             let newNodeIndex = [];
-            for(let i = 0, len = nodes.length; i < len; i++) {
+            for (let i = 0, len = nodes.length; i < len; i++) {
                 let node = nodes[i],
                     obj = {};
                 let type = +node.type;
                 node.id = node.id || node.phoneNumber;
-                if(this.nodeMap[type] && this.nodeMap[type][node.id] > -1) continue;
+                if (this.nodeMap[type] && this.nodeMap[type][node.id] > -1) continue;
                 obj.category = type;
                 obj.type = type;
                 obj.index = this.graphDatas.length;
-                if(!this.nodeMap[type]) this.nodeMap[type] = {};
+                if (!this.nodeMap[type]) this.nodeMap[type] = {};
                 this.nodeMap[type][node.id] = obj.index;
-                if(type == GRAPH_NODE_TYPE.PERSON) {
+                if (type == GRAPH_NODE_TYPE.PERSON) {
                     obj.name = node.xm;
                     obj.value = node.gmsfhm;
-                }
-                else if(type == GRAPH_NODE_TYPE.CAR) {
+                } else if (type == GRAPH_NODE_TYPE.CAR) {
                     obj.name = node.sf + node.hphm;
                     obj.value = node.jdcxh;
-                }
-                else if(type == GRAPH_NODE_TYPE.CASE) {
+                } else if (type == GRAPH_NODE_TYPE.CASE) {
                     obj.name = node.ajlx;
                     obj.value = node.ajh;
-                }
-                else if(type == GRAPH_NODE_TYPE.CARD) {
+                } else if (type == GRAPH_NODE_TYPE.CARD) {
                     obj.name = node.zhh;
                     obj.value = node.dhhm;
-                }
-                else if(type == GRAPH_NODE_TYPE.PHONE) {
+                } else if (type == GRAPH_NODE_TYPE.PHONE) {
                     obj.name = obj.value = node.phoneNumber;
                 }
-                if(this.nodeNameList[obj.name] === undefined) {
+                if (this.nodeNameList[obj.name] === undefined) {
                     this.nodeNameList[obj.name] = 0;
-                }
-                else {
+                } else {
                     this.nodeNameList[obj.name]++;
                     obj.name = `${obj.name}(${this.nodeNameList[obj.name]})`;
                 }
@@ -693,7 +652,7 @@ export default {
                 this.graphDatas.push(obj);
             }
             let rootNode = this.graphDatas[0];
-            if(isNewGraph && rootNode) {
+            if (isNewGraph && rootNode) {
                 rootNode.category = 0;
                 rootNode.symbolSize = 70;
                 rootNode.hasClick = rootNode.childrenVisible = true;
@@ -707,37 +666,34 @@ export default {
         },
         handleLinkData(links, isNewGraph) {
             let source, personType;
-            for(let i = 0, len = links.length; i < len; i++) {
+            for (let i = 0, len = links.length; i < len; i++) {
                 let link = links[i],
                     obj = {};
                 let linkType = link.type,
                     targetNode = link.target;
-                if(!i) {
+                if (!i) {
                     let sourceNode = link.source;
                     personType = +sourceNode.personType || +GRAPH_PERSON_TYPE.REGULAR;
                     let sourceId = sourceNode.id || sourceNode.phoneNumber;
                     source = +this.nodeMap[+sourceNode.type][sourceId];
                 }
                 targetNode.personType = targetNode.personType || personType;
-                if(!this.linkMap[source]) this.linkMap[source] = [];
+                if (!this.linkMap[source]) this.linkMap[source] = [];
                 let targetId = targetNode.id || targetNode.phoneNumber;
                 let target = +this.nodeMap[+targetNode.type][targetId];
-                if(source > -1 && target > -1) {
+                if (source > -1 && target > -1) {
                     obj.label = deepCopy(normalEdgeLabelStyle);
-                    if(!linkType) { //普通关系线条
-                        if((this.linkMap[source].indexOf(target) > -1 || (this.linkMap[target] && this.linkMap[target].indexOf(source) > -1))) continue;
+                    if (!linkType) { //普通关系线条
+                        if ((this.linkMap[source].indexOf(target) > -1 || (this.linkMap[target] && this.linkMap[target].indexOf(source) > -1))) continue;
                         this.linkMap[source].push(target);
                         obj.lineStyle = deepCopy(normalLineStyle);
                         obj.lineStyle.normal.color = obj.lineStyle.emphasis.color = GRAPH_COLOR[+personType];
-                    }
-                    else { //同行关系线条
-                        if(this.linkMap[source].indexOf(target) < 0) {
+                    } else { //同行关系线条
+                        if (this.linkMap[source].indexOf(target) < 0) {
                             this.linkMap[source].push(target);
-                        }
-                        else if(this.linkMap[target] && this.linkMap[target].indexOf(source) < 0) {
+                        } else if (this.linkMap[target] && this.linkMap[target].indexOf(source) < 0) {
                             this.linkMap[target].push(source);
-                        }
-                        else {
+                        } else {
                             continue;
                         }
                         obj.lineStyle = deepCopy(curveLineStyle);
@@ -761,13 +717,13 @@ export default {
             };
         },
         async handleGraphData(newNodeIndex, source, personType = +GRAPH_PERSON_TYPE.REGULAR) {
-            if(source === undefined) return;
+            if (source === undefined) return;
             let indexTreeObj = this.findNodeIndexTree(this.nodeIndexTree, source);
-            if(!indexTreeObj && !isNaN(source) && source > -1) {
+            if (!indexTreeObj && !isNaN(source) && source > -1) {
                 this.nodeIndexTree[+source] = {};
                 indexTreeObj = this.nodeIndexTree[+source];
             }
-            for(let index of newNodeIndex) {
+            for (let index of newNodeIndex) {
                 let graphData = this.graphDatas[index];
                 let nodeData = graphData.data;
                 nodeData.personType = nodeData.personType || personType;
@@ -783,18 +739,18 @@ export default {
                         resolve(category[nodeData.personType] || 'circle');
                     };
                     img.src = src;
-                    setTimeout(img.onerror,500);
+                    setTimeout(img.onerror, 1000);
                 });
                 graphData.label = deepCopy(normalLabelStyle);
                 graphData.label.normal.backgroundColor = graphData.label.emphasis.backgroundColor = GRAPH_COLOR[+nodeData.personType];
-                if(graphData.type == GRAPH_NODE_TYPE.PERSON && nodeData.personType != GRAPH_PERSON_TYPE.REGULAR) {
+                if (graphData.type == GRAPH_NODE_TYPE.PERSON && nodeData.personType != GRAPH_PERSON_TYPE.REGULAR) {
                     graphData.name = `${graphData.name} - ${nodeData.personDesc.slice(0,-2)}`;
                 }
-                if(index != source) indexTreeObj[index] = {};
+                if (index != source) indexTreeObj[index] = {};
             }
         },
         handleSearchRecord(isNewGraph) {
-            if(isNewGraph) {
+            if (isNewGraph) {
                 this.searchList.push({
                     rootNode: this.rootNode,
                     edgeNumMap: this.edgeNumMap,
@@ -805,10 +761,9 @@ export default {
                     graphEdges: this.graphEdges,
                     nodeNameList: this.nodeNameList
                 });
-            }
-            else {
-                for(let item of this.searchList) {
-                    if(item.rootNode.gmsfhm === this.rootNode.gmsfhm) {
+            } else {
+                for (let item of this.searchList) {
+                    if (item.rootNode.gmsfhm === this.rootNode.gmsfhm) {
                         item.edgeNumMap = this.edgeNumMap;
                         item.nodeIndexTree = this.nodeIndexTree;
                         item.linkMap = this.linkMap;
@@ -822,7 +777,7 @@ export default {
         },
         searchRecordClick(item) {
             this.nodeDetailShow = this.accompanyFormShow = false;
-            if(item.rootNode.gmsfhm != this.rootNode.gmsfhm) {
+            if (item.rootNode.gmsfhm != this.rootNode.gmsfhm) {
                 this.rootNode = item.rootNode;
                 this.edgeNumMap = item.edgeNumMap;
                 this.nodeIndexTree = item.nodeIndexTree;

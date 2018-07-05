@@ -73,15 +73,12 @@
             </div>
         </div>
         <Modal class="mapTable" v-model="mapTable" title="区域人口详情">
-            <Table :columns="mapTableColumn" :data="mapTableData"> </Table>
-             <Page v-show="mapTableData.length>0" placement="top" :page-size="pageSize" :total='pageTotal' :current='currentPage' show-elevator show-sizer show-total @on-change='changePage' @on-page-size-change='changePageSize'></Page>
+            <Table :columns="mapTableColumn" :data="mapTableData"></Table>
+            <Page v-show="mapTableData.length>0" placement="top" :page-size="pageSize" :total='pageTotal' :current='currentPage' show-elevator show-sizer show-total @on-change='changePage' @on-page-size-change='changePageSize'></Page>
             <div slot="footer" class="footer">
                 <Button type="primary" @click="mapTable=false;">确定</Button>
             </div>
-            <Spin fix v-show="spinShow">
-                <Icon type="load-c" size="18" class="demo-spin-icon-load"></Icon>
-                <div>加载中...</div>
-            </Spin>
+            <Spin fix v-show="spinShow"></Spin>
         </Modal>
     </div>
 </template>

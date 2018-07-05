@@ -1,7 +1,7 @@
 <style scoped lang="less" src="./SearchInput.less"></style>
 <template>
     <div class="cmp-search-input" :class="{'large-input':type=='large','has-button':!!btnText || !!btnIcon,'is-ie9':isIE9,'no-icon':!inputIcon}">
-        <Input ref="searchInput" @click.native="onClick" @on-keyup="onInputChange" @on-blur="onBlur" @on-focus="showPlaceHolder=false;" v-model="inputModelCopy" @on-click="inputIconClick" :icon="inputIcon" @on-enter="enter" :placeholder="placeholder">
+        <Input ref="searchInput" @click.native="onClick" @on-keyup="onInputChange" @on-blur="onBlur" @on-focus="showPlaceHolder=false;" v-model.trim="searchText" @on-click="inputIconClick" :icon="inputIcon" @on-enter="enter" :placeholder="placeholder">
         <Button type="primary" v-show="btnText" slot="append" @click.native="btnClick">{{btnText}}</Button>
         <Button type="primary" v-show="btnIcon" slot="append" :icon="btnIcon" @click.native="btnClick"></Button>
         <img v-show="type=='small'" slot="append" src="../../images/superRecord/search.png" height="16" width="16" @click="inputIconClick" />
@@ -13,25 +13,14 @@
     export default {
         name: 'SearchInput',
         props: {
-            btnIcon: [String],
-            btnText: [String],
-            btnClick: {
-                type: Function
-            },
-            enter: {
-                type: Function
-            },
-            inputIconClick: {
-                type: Function
-            },
-            inputIcon: [String],
-            placeholder: {
-                type: String,
-                default: '请输入简单的关键词，如姓名或身份证号或手机号'
-            },
-            inputModel: {
-                type: String
-            },
+            btnIcon: String,
+            btnText: String,
+            btnClick: Function,
+            enter: Function,
+            inputIconClick: Function,
+            inputIcon: String,
+            placeholder: String,
+            searchText: String,
             type: {
                 type: String,
                 default: 'small'
@@ -45,24 +34,16 @@
         },
         methods: {
             onInputChange(e) {
-                this.$emit('update:inputModel', e.target.value);
+                this.$emit('update:searchText', e.target.value);
             },
             onBlur() {
-                if(!this.inputModelCopy) {
+                if(!this.searchText) {
                     this.showPlaceHolder = true;
                 }
             },
             onClick() {
                 this.showPlaceHolder = false;
                 this.$refs.searchInput.focus();
-            }
-        },
-        computed: {
-            inputModelCopy: {
-                get() {
-                    return this.inputModel;
-                },
-                set() {}
             }
         }
     }

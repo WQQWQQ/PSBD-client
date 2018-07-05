@@ -92,7 +92,7 @@ const deepCopy = source => {
     if(source instanceof Array) {
         sourceCopy = [];
     }
-    else if(source instanceof Function) {
+    else if(source instanceof Function){
         return source;
     }
     else if(source instanceof Object) {
@@ -103,13 +103,12 @@ const deepCopy = source => {
     }
     for(let i in source) {
         if(source.hasOwnProperty(i)) {
-            sourceCopy[i] = source[i] instanceof Object ? deepCopy(source[i]) : source[i];
+            let value=source[i];
+            sourceCopy[i] = value instanceof Object ? deepCopy(value) : value;
         }
     }
     return sourceCopy;
 };
-
-const trim = str => typeof str === 'string' && str.replace(/^\s+|\s+$/gm, '');
 
 const throttle=(fn,delay=200,mustRun=500)=>{
     let timeout=null,start=new Date();
@@ -147,7 +146,6 @@ const removeStore = name => {
 export {
     getURLSearchParam,
     throttle,
-    trim,
     serialize,
     deepCopy,
     setStore,

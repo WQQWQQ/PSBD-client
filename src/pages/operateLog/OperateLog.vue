@@ -3,19 +3,19 @@
     <div id="operateLog">
         <div class="top-form">
             <label>开始时间：</label>
-            <DatePicker confirm :editable="dateEditable" @on-change="startTimeChange" :value="startTime" type="datetime" :options="dateOpt" placeholder="请选择开始时间"></DatePicker>
+            <DatePicker confirm :editable="false" @on-change="startTimeChange" :value="startTime" type="datetime" :options="dateOpt" placeholder="请选择开始时间"></DatePicker>
             <label>结束时间：</label>
-            <DatePicker confirm :editable="dateEditable" @on-change="endTimeChange" :value="endTime" type="datetime" :options="dateOpt" placeholder="请选择结束时间"></DatePicker>
+            <DatePicker confirm :editable="false" @on-change="endTimeChange" :value="endTime" type="datetime" :options="dateOpt" placeholder="请选择结束时间"></DatePicker>
             <label>IP：</label>
-            <i-input v-model="userIp" class="ipInput"></i-input>
+            <Input v-model.trim="userIp" class="ipInput" clearable></Input>
             <label>操作内容：</label>
-            <i-input v-model="operateContent" class="contentInput"></i-input>
+            <Input v-model.trim="operateContent" class="contentInput" clearable></Input>
             <label>操作人：</label>
-            <i-input v-model="operateUser" class="userInput"></i-input>
-            <i-button type="primary" @click="search">查询</i-button>
+            <Input v-model.trim="operateUser" class="userInput" clearable></Input>
+            <Button type="primary" @click="search">查询</Button>
         </div>
         <div ref="recordCon" class="table-wrapper">
-            <i-table stripe :columns="tableColumns" :data="logList"></i-table>
+            <Table stripe :columns="tableColumns" :data="logList"></Table>
         </div>
         <Page v-show="logList.length>0" placement="top" :page-size="pageSize" :total='pageTotal' :current='currentPage' show-elevator show-sizer show-total @on-change='changePage' @on-page-size-change='changePageSize'></Page>
     </div>
@@ -24,15 +24,10 @@
     import {
         getLogListByCondition
     }
-    from '../../services/getData';
-    import {
-        trim
-    }
-    from '../../services/utils';
+    from '@/services/getData';
     export default {
         data() {
             return {
-                dateEditable: false,
                 pageSize: window.innerHeight > 660 ? 20 : 10,
                 pageTotal: 0,
                 currentPage: 1,
@@ -86,10 +81,10 @@
                     align: 'center',
                     // width: 150,
                     key: 'operateResult',
-                    render: (h, params) => {
-                        let success = params.row.operateResult == 0;
-                        let text = success ? '操作成功' : '操作失败';
-                        let color = success ? '#20be63' : '#fd4b4c';
+                    render: (h, {row}) => {
+                        const success = row.operateResult == 0;
+                        const text = success ? '操作成功' : '操作失败';
+                        const color = success ? '#20be63' : '#fd4b4c';
                         return h('span', {
                             style: {
                                 color
@@ -106,21 +101,13 @@
             },
             getLogList() {
                 this.$refs.recordCon.scrollTop = 0;
-                this.operateContent = trim(this.operateContent);
-                this.operateUser = trim(this.operateUser);
-                this.userIp = trim(this.userIp);
-                this.$http(getLogListByCondition(this.startTime, this.endTime, this.operateContent, this.operateUser, this.userIp, this.page, this.pageSize), res => {
-                    let data = res.data;
-                    if(!res.code && data) {
+                getLogListByCondition(this.startTime, this.endTime, this.operateContent, this.operateUser, this.userIp, this.currentPage, this.pageSize).then(res => {
+                    const {data,code} = res;
+                    if(!code && data) {
                         this.logList = data.rows;
                         this.pageTotal = data.total;
                     }
-                    else {
-                        this.$Message.info('暂无数据');
-                    }
-                }, err => {
-                    this.$Message.error('网络错误');
-                });
+                }).catch(e=>console.error(e));
             },
             changePageSize(pageSize) {
                 this.pageSize = pageSize;
@@ -128,14 +115,12 @@
                 this.getLogList();
             },
             changePage(page) {
-                this.page = page;
+                this.currentPage = page;
                 this.getLogList();
             },
             search() {
-                if(new Date(this.startTime) > new Date(this.endTime)) {
-                    this.$Message.warning('开始时间不得大于结束时间');
-                    return;
-                }
+                if(new Date(this.startTime) > new Date(this.endTime)) return this.$Message.warning('开始时间不得大于结束时间');
+                if(this.userIp && !/((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)/.test(this.userIp)) return this.$Message.warning('请输入正确的ip地址');
                 this.currentPage = 1;
                 this.getLogList();
             }

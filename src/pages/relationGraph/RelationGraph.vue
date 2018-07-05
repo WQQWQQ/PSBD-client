@@ -6,7 +6,7 @@
         <div class="relation-graph-title" v-if="firstShow">
             <h1><img src="../../images/relationGraph/logo.png" height="60" width="60">关系图谱</h1>
         </div>
-        <search-input :enter="search" type="large" :btnText="btnText" :btnIcon="btnIcon" inputIcon="android-close" :class="{'top-left':!firstShow,'hide-icon':hideIconClass}" :inputModel.sync="searchText" :btnClick="search" :inputIconClick="clearText" @keyup.native='showIcon' />
+        <search-input placeholder="请输入简单的关键词，如姓名或身份证号或手机号" :enter="search" type="large" :btnText="btnText" :btnIcon="btnIcon" inputIcon="android-close" :class="{'top-left':!firstShow,'hide-icon':hideIconClass}" :searchText.sync="searchText" :btnClick="search" :inputIconClick="clearText" @keyup.native='showIcon' />
         <p v-if="firstShow" class="toggle-rule" @click="showRules=!showRules;">
             <span>{{showRules?'收起':'展开'}}规则说明</span>
             <Icon :type="showRules?'ios-arrow-up':'ios-arrow-down'"></Icon>
@@ -49,7 +49,7 @@
                         <p><span><i>手机号：</i><i>{{graphDatas[selectNodeIndex].data.phoneNumber}}</i></span><span><i>机主姓名：</i><i>{{graphDatas[selectNodeIndex].data.householdName}}</i></span></p>
                     </div>
                 </div>
-                <i-table :class="{'no-table':!isPhoneDetail}" :stripe="isPhoneDetail" :highlight-row="isPhoneDetail" @on-row-click="locateMap" :show-header="!hideTableHeader" size="small" :columns="nodeDetailColumns" :data="nodeDetailData" :height="detailPanelHeight"></i-table>
+                <Table :class="{'no-table':!isPhoneDetail}" :stripe="isPhoneDetail" :highlight-row="isPhoneDetail" @on-row-click="locateMap" :show-header="!hideTableHeader" size="small" :columns="nodeDetailColumns" :data="nodeDetailData" :height="detailPanelHeight"></Table>
                 <div id="map" v-show="mapShow"></div>
             </Card>
         </transition>
@@ -76,11 +76,11 @@
         <Card v-show="accompanyFormShow" class="accompany-form" :class="{'offset-right':nodeDetailShow}">
             <p>
                 <span class="label">开始时间：</span>
-                <DatePicker confirm :editable="dateEditable" @on-change="txStartDateChange" :value="txStartDate" type="datetime" :options="dateOpt" placeholder="请选择开始日期"></DatePicker>
+                <DatePicker confirm :editable="false" @on-change="txStartDateChange" :value="txStartDate" type="datetime" :options="dateOpt" placeholder="请选择开始日期"></DatePicker>
             </p>
             <p>
                 <span class="label">结束时间：</span>
-                <DatePicker confirm :editable="dateEditable" @on-change="txEndDateChange" :value="txEndDate" type="datetime" :options="dateOpt" placeholder="请选择结束日期"></DatePicker>
+                <DatePicker confirm :editable="false" @on-change="txEndDateChange" :value="txEndDate" type="datetime" :options="dateOpt" placeholder="请选择结束日期"></DatePicker>
             </p>
             <p>
                 <span class="label">同行频次：</span>

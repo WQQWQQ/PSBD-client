@@ -40,201 +40,174 @@
                 </div>
             </div>
         </div>
-        <Spin fix v-show="spinShow">
-            <Icon type="load-c" size="18" class="demo-spin-icon-load"></Icon>
-            <div>加载中...</div>
-        </Spin>
+        <Spin fix v-show="spinShow"></Spin>
     </Modal>
 </template>
 <script>
-    import {
-        deepCopy
-    }
-    from '../../services/utils';
-    import {
-        getPeerAnalysisRecordList
-    }
-    from '../../services/getData';
-    import {
-        activityList,
-        txTypeList
-    }
-    from '../../config/baseConfig';
-    export default {
-        name: 'AnalyseDetail',
-        props: {
-            bids: {
-                type: Array,
-                default() {
-                    return [];
-                }
-            },
-            modal: {
-                type: Boolean,
-                default: false
-            },
-            mode: {
-                type: String,
-                default: 'activity'
-            },
-            categoryList: {
-                type: Array,
-                default() {
-                    return [];
-                }
-            },
-            recordList: {
-                type: Array,
-                default() {
-                    return [];
-                }
-            },
-            personName: {
-                type: String,
-                default: ''
-            },
-            startDate: {
-                type: String,
-                default: ''
-            },
-            endDate: {
-                type: String,
-                default: ''
-            },
-            option: {
-                type: Number,
-                default: 0
+import {
+    deepCopy
+}
+from '@/services/utils';
+import {
+    getPeerAnalysisRecordList
+}
+from '@/services/getData';
+import {
+    activityList,
+    txTypeList
+}
+from '@/config/baseConfig';
+export default {
+    name: 'AnalyseDetail',
+    props: {
+        bids: {
+            type: Array,
+            default () {
+                return [];
             }
         },
-        data() {
-            return {
-                spinShow:false,
-                dateConfirm: true,
-                dateEditable: false,
-                allAccompanyRecordList: [],
-                categoryListCopy: this.categoryList,
-                recordListCopy:this.recordList,
-                dateOpt: {
-                    disabledDate(date) {
-                        // return date && date.valueOf() > Date.now();
-                    }
-                }
+        modal: {
+            type: Boolean,
+            default: false
+        },
+        mode: {
+            type: String,
+            default: 'activity'
+        },
+        categoryList: {
+            type: Array,
+            default () {
+                return [];
             }
         },
-        watch:{
-            recordList(val){
-                this.$refs.recordCon.scrollTop=0;
-                this.recordListCopy=val;
-            },
-            categoryList(val){
-                this.categoryListCopy=val;
+        recordList: {
+            type: Array,
+            default () {
+                return [];
             }
         },
-        computed: {
-            modalCopy:{
-                get() {
-                    return this.modal;
-                },
-                set() {}
-            },
-            title() {
-                return this.mode == 'activity' ? '活动分析' : '同行分析';
-            },
-            selectLabel() {
-                return this.mode == 'activity' ? '活动类型' : '同行类型';
-            },
-            selectList() {
-                let selectList=[];
-                if(this.mode=='activity'){
-                    selectList= deepCopy(activityList);
-                }else{
-                    selectList=deepCopy(txTypeList);
-                    selectList.unshift({
-                        name:'全部',
-                        value:0
-                    });
+        personName: String,
+        startDate: String,
+        endDate: String,
+        option: {
+            type: Number,
+            default: 0
+        }
+    },
+    data() {
+        return {
+            spinShow: false,
+            dateConfirm: true,
+            dateEditable: false,
+            allAccompanyRecordList: [],
+            categoryListCopy: this.categoryList,
+            recordListCopy: this.recordList,
+            dateOpt: {
+                disabledDate(date) {
+                    // return date && date.valueOf() > Date.now();
                 }
-                return selectList;
-            },
-            optionCopy:{
-                get() {
-                    return this.option;
-                },
-                set() {}
-            },
-            startDateCopy(){
-                return this.startDate;
-            },
-            endDateCopy(){
-                return this.endDate;
-            }
-        },
-        methods: {
-            onVisibleChange(val) {
-                if(val && this.mode == 'accompany') {
-                    this.spinShow=true;
-                    this.allAccompanyRecordList = [];
-                    this.onSelectChange(this.optionCopy);
-                }
-                this.$emit('update:modal', val);
-            },
-            onSelectChange(val) {
-                if(this.mode == 'accompany') {
-                    if(this.allAccompanyRecordList.length > 0) {
-                        this.recordListCopy=this.allAccompanyRecordList.filter(item => !val || (item.type == this.selectList[+val].name),this);
-                    }
-                    else {
-                        this.$http(getPeerAnalysisRecordList(JSON.stringify({
-                            data: this.bids
-                        })), res => {
-                            let data=res.data;
-                            if(!res.code && data) {
-                                this.allAccompanyRecordList = data;
-                                this.categoryListCopy = [];
-                                for(let i = 0, len = txTypeList.length; i < len; i++) {
-                                    let txTypeObj = txTypeList[i];
-                                    this.categoryListCopy.push({
-                                        dataName: txTypeObj.name,
-                                        dataSize: data.filter(item => item.type == txTypeObj.name,this).length
-                                    });
-                                }
-                                this.recordListCopy = this.allAccompanyRecordList.filter(item =>  !val || item.type == this.selectList[+val].name,this);
-                            }
-                            else {
-                                this.$Message.info('暂无数据');
-                            }
-                            this.spinShow=false;
-                        }, err => {
-                            this.spinShow=false;
-                            this.$Message.error('网络错误');
-                        });
-                    }
-                }
-                this.$emit('update:option', val);
-            },
-            startDateChange(date) {
-                this.$emit('update:startDate', date);
-            },
-            endDateChange(date) {
-                this.$emit('update:endDate', date);
-            },
-            searchActivity() {
-                if(!this.startDate) {
-                    this.$Message.warning('请选择开始时间');
-                    return;
-                }
-                if(!this.endDate) {
-                    this.$Message.warning('请选择结束时间');
-                    return;
-                }
-                if(new Date(this.startDate) > new Date(this.endDate)) {
-                    this.$Message.warning('开始时间不得大于结束时间');
-                    return;
-                }
-                this.$emit('search');
             }
         }
+    },
+    watch: {
+        recordList(val) {
+            this.$refs.recordCon.scrollTop = 0;
+            this.recordListCopy = val;
+        },
+        categoryList(val) {
+            this.categoryListCopy = val;
+        }
+    },
+    computed: {
+        modalCopy: {
+            get() {
+                return this.modal;
+            },
+            set() {}
+        },
+        title() {
+            return this.mode == 'activity' ? '活动分析' : '同行分析';
+        },
+        selectLabel() {
+            return this.mode == 'activity' ? '活动类型' : '同行类型';
+        },
+        selectList() {
+            let selectList = [];
+            if (this.mode == 'activity') {
+                selectList = deepCopy(activityList);
+            } else {
+                selectList = deepCopy(txTypeList);
+                selectList.unshift({
+                    name: '全部',
+                    value: 0
+                });
+            }
+            return selectList;
+        },
+        optionCopy: {
+            get() {
+                return this.option;
+            },
+            set() {}
+        },
+        startDateCopy() {
+            return this.startDate;
+        },
+        endDateCopy() {
+            return this.endDate;
+        }
+    },
+    methods: {
+        onVisibleChange(val) {
+            if (val && this.mode == 'accompany') {
+                this.spinShow = true;
+                this.allAccompanyRecordList = [];
+                this.onSelectChange(this.optionCopy);
+            }
+            this.$emit('update:modal', val);
+        },
+        onSelectChange(val) {
+            if (this.mode == 'accompany') {
+                if (this.allAccompanyRecordList.length > 0) {
+                    this.recordListCopy = this.allAccompanyRecordList.filter(item => !val || (item.type == this.selectList[+val].name), this);
+                } else {
+                    getPeerAnalysisRecordList(JSON.stringify({
+                        data: this.bids
+                    })).then(res => {
+                        const { code, data } = res;
+                        if (!code && data) {
+                            this.allAccompanyRecordList = data;
+                            this.categoryListCopy = [];
+                            txTypeList.map(({name})=>{
+                                this.categoryListCopy.push({
+                                    dataName: name,
+                                    dataSize: data.filter(item => item.type == name, this).length
+                                });
+                            });
+                            this.recordListCopy = this.allAccompanyRecordList.filter(item => !val || item.type == this.selectList[+val].name, this);
+                        }
+                        this.spinShow = false;
+                    }).catch(e => {
+                        this.spinShow = false;
+                        console.error(e);
+                    });
+                }
+            }
+            this.$emit('update:option', val);
+        },
+        startDateChange(date) {
+            this.$emit('update:startDate', date);
+        },
+        endDateChange(date) {
+            this.$emit('update:endDate', date);
+        },
+        searchActivity() {
+            if (!this.startDate) return this.$Message.warning('请选择开始时间');
+            if (!this.endDate) return this.$Message.warning('请选择结束时间');
+            if (new Date(this.startDate) > new Date(this.endDate)) return this.$Message.warning('开始时间不得大于结束时间');
+            this.$emit('search');
+        }
     }
+}
 
 </script>
-

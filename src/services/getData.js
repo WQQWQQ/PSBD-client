@@ -4,372 +4,270 @@ import {
 }
 from './utils';
 import axios from 'axios';
-const baseURL='/api';
-axios.defaults.baseURL = baseURL;
+axios.defaults.baseURL = '/api';
 axios.defaults.timeout = 100000;
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 axios.defaults.headers['X-Requested-With'] = 'XMLHttpRequest';
 
 axios.interceptors.request.use(config => {
-    console.log(config);
-    config.params=config.params || {};
-    let token=getURLSearchParam('token');
-    if(token){
-        config.params.token=token;
-        config.params.fv=getURLSearchParam('fv');
+    config.params = config.params || {};
+    let token = getURLSearchParam('token');
+    if (token && config.url.indexOf('exportWordData') < 0) {
+        config.params.token = token;
+        config.params.fv = getURLSearchParam('fv');
     }
     return config;
-}, err => {
-    return Promise.reject(err);
-});
+}, err => Promise.reject(err));
 
-const $post = (url, data) => {
+/*const $post = (url, data) => {
     if(window.navigator.appVersion.indexOf('MSIE 9.0') > 0 && window.XDomainRequest) {
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             let xdr = new XDomainRequest();
             // xdr.contentType = "text/plain";
             xdr.open('POST', url);
-            xdr.onload = function() {
+            xdr.onload = () => {
                 resolve({
                     data: JSON.parse(xdr.responseText)
                 });
                 xdr = null;
             };
-            xdr.ontimeout = function() {
+            xdr.ontimeout = xdr.onerror =  () => {
                 reject({
                     data: JSON.parse(xdr.responseText)
                 });
                 xdr = null;
             };
-            xdr.onerror = function() {
-                reject({
-                    data: JSON.parse(xdr.responseText)
-                });
-                xdr = null;
-            };
-            setTimeout(function() {
+            setTimeout(() => {
                 xdr.send(serialize(data));
             }, 0);
         });
     }
     return axios.post(url, data);
-};
+};*/
 
-const $http = (promise, success, error) => {
-    promise.then((res) => {
-        let data = res.data;
-        data && success && success(data);
-    }).catch((err) => {
-        error && error(err);
-    });
-};
+const $http = promise => promise.then(res => res.data).catch(err => console.error(err));
 
-const getRelation = searchContent => {
-    return axios.get('/relation/getRelationShip.action', {
-        params: {
-            searchContent
-        }
-    });
-};
+const getTodayOverview = () => $http(axios.get('/home/getTodayOverview.action'));
 
-const getCallRecordByPhoneNumber = phoneNumber => {
-    return axios.get('/relation/getCallRecordByPhoneNumber.action', {
-        params: {
-            phoneNumber
-        }
-    });
-};
+const getCarCountByMonth = () => $http(axios.get('/home/getCarCountByMonth.action'));
 
-const getCarDirectory = () => {
-    return axios.get('/superfile/carfile/getCarDirectory.action');
-};
+const getCarWfjlCountByMonth = () => $http(axios.get('/home/getIllegalRecordCountByMonth.action'));
 
-const getCarInfoDetail = id => {
-    return axios.get('/superfile/carfile/getCarInfoDetail.action', {
-        params: {
-            id
-        }
-    });
-};
+const getCaseCountByAjzt = () => $http(axios.get('/home/getCaseCountByCaseState.action'));
 
-const getCarInfos = (name, type, page = 1, pageSize = 20, keywords = "") => {
-    return axios.get('/superfile/carfile/getCarInfos.action', {
-        params: {
-            name,
-            type,
-            page,
-            pageSize,
-            keywords
-        }
-    });
-};
+const getCaseCountByFadd = () => $http(axios.get('/home/getCaseCountByCasePlace.action'));
 
-const getCaseDirectory = () => {
-    return axios.get('/superfile/casefile/getCaseDirectory.action');
-};
+const getCaseCountByMonth = () => $http(axios.get('/home/getCaseCountByMonth.action'));
 
-const getCaseInfoDetail = id => {
-    return axios.get('/superfile/casefile/getCaseInfoDetail.action', {
-        params: {
-            id
-        }
-    });
-};
+const getCaseCountByWhcd = () => $http(axios.get('/home/getCaseCountByDamage.action'));
 
-const getCaseInfos = (name, type, page = 1, pageSize = 20, keywords = "") => {
-    return axios.get('/superfile/casefile/getCaseInfos.action', {
-        params: {
-            name,
-            type,
-            page,
-            pageSize,
-            keywords
-        }
-    });
-};
+const getPersonCountByAddress = () => $http(axios.get('/home/getPersonCountByAddress.action'));
 
-const getDataCount = () => {
-    return axios.get('/datawarehouse/getDataCount.action');
-};
+const getPersonTypeRate = () => $http(axios.get('/home/getPersonTypeRate.action'));
 
-const getPersonDataCount = () => {
-    return axios.get('/datawarehouse/getPersonDataCount.action');
-};
+const getRelation = searchContent => $http(axios.get('/relation/getRelationShip.action', {
+    params: {
+        searchContent
+    }
+}));
 
-const getDataTableClassify = () => {
-    return axios.get('/datawarehouse/getDataTableClassify.action');
-};
+const getCallRecordByPhoneNumber = phoneNumber => $http(axios.get('/relation/getCallRecordByPhoneNumber.action', {
+    params: {
+        phoneNumber
+    }
+}));
 
-const getCarDataCount = () => {
-    return axios.get('/datawarehouse/getCarDataCount.action');
-};
+const getCarDirectory = () => $http(axios.get('/superfile/carfile/getCarDirectory.action'));
 
-const getCaseDataCount = () => {
-    return axios.get('/datawarehouse/getCaseDataCount.action');
-};
+const getCarInfoDetail = id => $http(axios.get('/superfile/carfile/getCarInfoDetail.action', {
+    params: {
+        id
+    }
+}));
 
-const getPersonDirectory = () => {
-    return axios.get('/superfile/personnelFile/getPersonnelFileCatagory.action');
-};
-
-const getPersonInfoDetail = (id, type) => {
-    return axios.get('/superfile/personnelFile/getPersonInfoById.action', {
-        params: {
-            id,
-            type
-        }
-    });
-};
-
-const getPersonInfos = (type, name = "", page = 1, pageSize = 20, keyWord = "") => {
-    return axios.get('/superfile/personnelFile/getPersonList.action', {
-        params: {
-            type,
-            name,
-            page,
-            pageSize,
-            keyWord
-        }
-    });
-};
-
-const getTodayOverview = () => {
-    return axios.get('/home/getTodayOverview.action');
-};
-
-const getCarCountByMonth = () => {
-    return axios.get('/home/getCarCountByMonth.action');
-};
-
-const getCarWfjlCountByMonth = () => {
-    return axios.get('/home/getIllegalRecordCountByMonth.action');
-};
-
-const getCaseCountByAjzt = () => {
-    return axios.get('/home/getCaseCountByCaseState.action');
-};
-
-const getCaseCountByFadd = () => {
-    return axios.get('/home/getCaseCountByCasePlace.action');
-};
-
-const getCaseCountByMonth = () => {
-    return axios.get('/home/getCaseCountByMonth.action');
-};
-
-const getCaseCountByWhcd = () => {
-    return axios.get('/home/getCaseCountByDamage.action');
-};
-
-const getPersonCountByAddress = () => {
-    return axios.get('/home/getPersonCountByAddress.action');
-};
-
-const getDataClassifyCount = () => {
-    return axios.get('/datawarehouse/getDataClassifyCount.action');
-};
-
-const getPersonTypeRate = () => {
-    return axios.get('/home/getPersonTypeRate.action');
-};
-
-const getDataSearchDirectory = (searchContent) => {
-    return axios.get('/dataSearch/getDataBySearchContext.action', {
-        params: {
-            searchContent
-        }
-    });
-};
-
-const getActivityDirectory = (idCard, start, end) => {
-    return axios.get('/activityAnalysis/getActivityDirectory.action', {
-        params: {
-            idCard,
-            start,
-            end
-        }
-    });
-};
-
-const getPeerAnalysisByIdentityCard = (cardID, beginTime, endTime, frequency, txType) => {
-    return axios.get('/relation/getPeerAnalysisByIdentityCard.action', {
-        params: {
-            cardID,
-            beginTime,
-            endTime,
-            frequency,
-            txType
-        }
-    });
-};
-
-const getActivitySequence = (idCard, type, start, end) => {
-    return axios.get('/activityAnalysis/getActivitySequence.action', {
-        params: {
-            idCard,
-            start,
-            end,
-            type
-        }
-    });
-};
-
-const getKeyWorkByContext = (keyword, num = 5) => {
-    return axios.get('/dataSearch/getKeyWorkByContext.action', {
-        params: {
-            keyword,
-            num
-        }
-    });
-};
-
-const getSearchDetailMsg = (type, id) => {
-    return axios.get('/superfile/personnelFile/getPersonInfoById.action', {
-        params: {
-            type,
-            id
-        }
-    });
-};
-
-const getLogListByCondition = (beginTime, endTime, operateContent, operateUser, userIp, page = 1, pageSize = 10) => {
-    return axios.get('/log/getLogListByCondition.action', {
-        params: {
-            beginTime,
-            endTime,
-            operateContent,
-            operateUser,
-            userIp,
-            page,
-            pageSize
-        }
-    });
-};
-
-
-const getDataSearchInfoByTypeAndId = (id, type) => {
-    return axios.get('/dataSearch/getDataSearchInfoByTypeAndId.action', {
-        params: {
-            id,
-            type
-        }
-    });
-};
-
-const getAirPeerRecordList = (Ids) => {
-    return axios.get('/relation/getAirPeerRecordList.action', {
-        params: {
-            Ids
-        }
-    });
-};
-
-const getInternetPeerRecordList = (Ids) => {
-    return axios.get('/relation/getInternetPeerRecordList.action', {
-        params: {
-            Ids
-        }
-    });
-};
-
-const getStayPeerRecordList = (Ids) => {
-    return axios.get('/relation/getStayPeerRecordList.action', {
-        params: {
-            Ids
-        }
-    });
-};
-
-const getTrainPeerRecordList = (Ids) => {
-    return axios.get('/relation/getTrainPeerRecordList.action', {
-        params: {
-            Ids
-        }
-    });
-};
-
-const getPeerAnalysisRecordList = (ids) => {
-    return axios.get('/relation/getPeerAnalysisRecordList.action', {
-        params: {
-            ids
-        }
-    });
-};
-
-const getPersionListByRegion = (region, page, pageSize) => {
-    return axios.get('/home/getPersionListByRegion.action', {
-        params: {
-            region,
-            page,
-            pageSize
-        }
-    });
-};
-
-const getLoginInfo = () => {
-    return axios.get('/home/getLoginInfo.action');
-};
-
-const exportWordData = (type, id, personDetail, carDetail, caseDetail) => {
-    window.open(`${baseURL}/dataSearch/exportWordData.action?` + serialize({
+const getCarInfos = (name, type, page = 1, pageSize = 20, keywords = "") => $http(axios.get('/superfile/carfile/getCarInfos.action', {
+    params: {
+        name,
         type,
+        page,
+        pageSize,
+        keywords
+    }
+}));
+
+const getCaseDirectory = () => $http(axios.get('/superfile/casefile/getCaseDirectory.action'));
+
+const getCaseInfoDetail = id => $http(axios.get('/superfile/casefile/getCaseInfoDetail.action', {
+    params: {
+        id
+    }
+}));
+
+const getCaseInfos = (name, type, page = 1, pageSize = 20, keywords = "") => $http(axios.get('/superfile/casefile/getCaseInfos.action', {
+    params: {
+        name,
+        type,
+        page,
+        pageSize,
+        keywords
+    }
+}));
+
+const getDataCount = () => $http(axios.get('/datawarehouse/getDataCount.action'));
+
+const getPersonDataCount = () => $http(axios.get('/datawarehouse/getPersonDataCount.action'));
+
+const getDataTableClassify = () => $http(axios.get('/datawarehouse/getDataTableClassify.action'));
+
+const getCarDataCount = () => $http(axios.get('/datawarehouse/getCarDataCount.action'));
+
+const getCaseDataCount = () => $http(axios.get('/datawarehouse/getCaseDataCount.action'));
+
+const getPersonDirectory = () => $http(axios.get('/superfile/personnelFile/getPersonnelFileCatagory.action'));
+
+const getPersonInfoDetail = (id, type) => $http(axios.get('/superfile/personnelFile/getPersonInfoById.action', {
+    params: {
         id,
-        personDetail,
-        carDetail,
-        caseDetail
-    }));
-};
+        type
+    }
+}));
+
+const getPersonInfos = (type, name = "", page = 1, pageSize = 20, keyWord = "") => $http(axios.get('/superfile/personnelFile/getPersonList.action', {
+    params: {
+        type,
+        name,
+        page,
+        pageSize,
+        keyWord
+    }
+}));
+
+const getDataClassifyCount = () => $http(axios.get('/datawarehouse/getDataClassifyCount.action'));
+
+
+const getDataSearchDirectory = (searchContent) => $http(axios.get('/dataSearch/getDataBySearchContext.action', {
+    params: {
+        searchContent
+    }
+}));
+
+const getActivityDirectory = (idCard, start, end) => $http(axios.get('/activityAnalysis/getActivityDirectory.action', {
+    params: {
+        idCard,
+        start,
+        end
+    }
+}));
+
+const getPeerAnalysisByIdentityCard = (cardID, beginTime, endTime, frequency, txType) => $http(axios.get('/relation/getPeerAnalysisByIdentityCard.action', {
+    params: {
+        cardID,
+        beginTime,
+        endTime,
+        frequency,
+        txType
+    }
+}));
+
+const getActivitySequence = (idCard, type, start, end) => $http(axios.get('/activityAnalysis/getActivitySequence.action', {
+    params: {
+        idCard,
+        start,
+        end,
+        type
+    }
+}));
+
+const getKeyWorkByContext = (keyword, num = 5) => $http(axios.get('/dataSearch/getKeyWorkByContext.action', {
+    params: {
+        keyword,
+        num
+    }
+}));
+
+const getSearchDetailMsg = (type, id) => $http(axios.get('/superfile/personnelFile/getPersonInfoById.action', {
+    params: {
+        type,
+        id
+    }
+}));
+
+const getLogListByCondition = (beginTime, endTime, operateContent, operateUser, userIp, page = 1, pageSize = 10) => $http(axios.get('/log/getLogListByCondition.action', {
+    params: {
+        beginTime,
+        endTime,
+        operateContent,
+        operateUser,
+        userIp,
+        page,
+        pageSize
+    }
+}));
+
+
+const getDataSearchInfoByTypeAndId = (id, type) => $http(axios.get('/dataSearch/getDataSearchInfoByTypeAndId.action', {
+    params: {
+        id,
+        type
+    }
+}));
+
+/*const getAirPeerRecordList = (Ids) => $http(axios.get('/relation/getAirPeerRecordList.action', {
+    params: {
+        Ids
+    }
+}));
+
+const getInternetPeerRecordList = (Ids) => $http(axios.get('/relation/getInternetPeerRecordList.action', {
+    params: {
+        Ids
+    }
+}));
+
+const getStayPeerRecordList = (Ids) => $http(axios.get('/relation/getStayPeerRecordList.action', {
+    params: {
+        Ids
+    }
+}));
+
+const getTrainPeerRecordList = (Ids) => $http(axios.get('/relation/getTrainPeerRecordList.action', {
+    params: {
+        Ids
+    }
+}));*/
+
+const getPeerAnalysisRecordList = (ids) => $http(axios.get('/relation/getPeerAnalysisRecordList.action', {
+    params: {
+        ids
+    }
+}));
+const getPersionListByRegion = (region, page, pageSize) => $http(axios.get('/home/getPersionListByRegion.action', {
+    params: {
+        region,
+        page,
+        pageSize
+    }
+}));
+
+const getLoginInfo = () => $http(axios.get('/home/getLoginInfo.action'));
+
+const exportWordData = (type, id, { personDetail = {}, carDetail = {}, caseDetail = {} }) => window.open(`${axios.defaults.baseURL}/dataSearch/exportWordData.action?` + serialize({
+    type,
+    id,
+    personDetail,
+    carDetail,
+    caseDetail
+}));;
 
 export {
-    $http,
     getLoginInfo, //获取用户信息
     exportWordData, //导出记录详情
     getPersionListByRegion, //根据区域获取人口列表
     getPeerAnalysisRecordList, //根据BID和同行类型查询同行记录
-    getAirPeerRecordList, //查询飞机同行记录
-    getStayPeerRecordList, //查询同住宿记录
-    getTrainPeerRecordList, //查询火车同行记录
-    getInternetPeerRecordList, //查询同上网记录
+    // getAirPeerRecordList, //查询飞机同行记录
+    // getStayPeerRecordList, //查询同住宿记录
+    // getTrainPeerRecordList, //查询火车同行记录
+    // getInternetPeerRecordList, //查询同上网记录
     getLogListByCondition, //获取操作日志列表
     getKeyWorkByContext, //根据关键字进行数据搜索
     getActivitySequence, //获取关系图谱活动时序列表

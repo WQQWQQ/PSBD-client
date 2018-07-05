@@ -1,10 +1,11 @@
 @import '../../style/mixins';
 @border-color: #cee0f0;
+@deep: ~'>>>';
 
 .person-detail-modal {
     height: 100%;
 
-    /deep/ .ivu-modal {
+    @{deep} .ivu-modal {
         max-width: 800px !important;
         max-height: 808px !important;
 

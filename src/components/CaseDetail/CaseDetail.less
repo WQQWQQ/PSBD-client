@@ -1,7 +1,8 @@
 @import '../../style/mixins';
+@deep: ~'>>>';
 
 .case-detail-modal {
-    /deep/ .ivu-modal {
+    @{deep} .ivu-modal {
         max-width: 900px !important;
         max-height: 737px !important;
 

@@ -9,6 +9,10 @@ body {
     height: 100%;
 }
 
+[v-cloak] {
+    display: none;
+}
+
 #app {
     height: 100%;
     position: relative;
@@ -214,7 +218,9 @@ body {
 .mapTable {
     .ivu-modal-content {
         .ivu-modal-body {
-            padding-bottom: 66px;
+            .ivu-table-wrapper {
+                margin-bottom: 66px;
+            }
 
             .ivu-page {
                 width: 100%;

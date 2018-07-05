@@ -5,16 +5,15 @@ const path = require('path');
 
 module.exports = {
     dev: {
-
-
         // Paths
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
-        dllPath: path.resolve(__dirname, '../src/static/js'),
+        dllPath: path.resolve(__dirname, '../src/lib'),
 
         proxyTable: {
             '/api':{
-                target:'http://192.168.30.29:8900',
+                target:'http://172.16.11.218:8900',
+                // target:'http://192.168.30.29:8900',
                 // target:'http://192.168.30.19:8010',
                 // target:'http://192.168.30.29:8090',
                 secure: false,
@@ -70,7 +69,7 @@ module.exports = {
         assetsRoot: path.resolve(__dirname, '../dist/psbd'),
         assetsSubDirectory: 'src/static',
         assetsPublicPath: '/psbd/',
-        dllPath: path.resolve(__dirname, '../dist/src/static/js'),
+        dllPath: path.resolve(__dirname, '../dist/psbd/src/static/js'),
 
         /**
          * Source Maps

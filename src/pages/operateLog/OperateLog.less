@@ -1,4 +1,5 @@
 @import '../../style/mixins';
+@deep: ~'>>>';
 
 #operateLog {
     height: 100%;
@@ -22,7 +23,7 @@
         .ivu-input-wrapper {
             margin-right: 15px;
 
-            /deep/ .ivu-input {
+            @{deep} .ivu-input {
                 font-size: 12px;
             }
 
@@ -59,7 +60,7 @@
         text-align: right;
         background-color: #fff;
 
-        /deep/ .ivu-select-dropdown {
+        @{deep} .ivu-select-dropdown {
             top: -120px !important;
         }
 

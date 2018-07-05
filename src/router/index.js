@@ -21,80 +21,50 @@ const router = new Router({
     routes: [{
         path: '/',
         name: 'home',
-        meta: {
-            requireAuth: true
-        },
         redirect: '/homePage',
         alias: ['/index'],
         component: Home,
         children: [{
             path: 'homePage',
             name: 'homePage',
-            component: HomePage,
-            meta: {
-                requireAuth: true
-            }
+            component: HomePage
         }, {
             path: 'dataSearch',
             name: 'dataSearch',
-            component: DataSearch,
-            meta: {
-                requireAuth: true
-            }
+            component: DataSearch
         }, {
             path: 'relationGraph',
             name: 'relationGraph',
-            component: RelationGraph,
-            meta: {
-                requireAuth: true
-            }
+            component: RelationGraph
         }, {
             path: 'superRecord',
             name: 'superRecord',
             component: SuperRecord,
-            meta: {
-                requireAuth: true
-            },
             redirect: '/superRecord/person',
             children: [{
                     path: 'person',
                     name: 'person',
-                    meta: {
-                        requireAuth: true
-                    },
                     component: Person
                 },
                 {
                     path: 'car',
                     name: 'car',
-                    meta: {
-                        requireAuth: true
-                    },
                     component: Car
                 },
                 {
                     path: 'case',
                     name: 'case',
-                    meta: {
-                        requireAuth: true
-                    },
                     component: Case
                 }
             ]
         }, {
             path: 'dataRepository',
             name: 'dataRepository',
-            component: DataRepository,
-            meta: {
-                requireAuth: true
-            }
+            component: DataRepository
         }, {
             path: 'operateLog',
             name: 'operateLog',
-            component: OperateLog,
-            meta: {
-                requireAuth: true
-            }
+            component: OperateLog
         }]
     }, {
         path: '*',

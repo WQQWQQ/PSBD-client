@@ -5,6 +5,7 @@ var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin =require('optimize-css-assets-webpack-plugin');
+const manifest = require('./vendors-manifest.json')
 // const vueLoaderConfig = require('./vue-loader.conf');
 
 function resolve(dir) {
@@ -33,7 +34,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js',
+      // 'vue$': 'vue/dist/vue.runtime.esm.js',
       '@': resolve('src')
     }
   },
@@ -71,7 +72,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'),resolve('node_modules/webpack-dev-server/client')]
+        include: [resolve('src'),resolve('node_modules/webpack-dev-server/client'),resolve('node_modules/_iview@2.14.3@iview/src'),resolve('node_modules/iview/src')]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/i,
@@ -101,16 +102,17 @@ module.exports = {
   },
   plugins: [
     new webpack.LoaderOptionsPlugin({
+      minimize: true,
       options: {
         postcss: [autoprefixer()]
       }
     }),
     iviewExtract,
     styleExtract,
-    /*new webpack.DllReferencePlugin({
+    new webpack.DllReferencePlugin({
       context: __dirname,
-      manifest: require('./vendors-manifest.json')
-    }),*/
+      manifest
+    }),
     new OptimizeCssAssetsPlugin()
   ]
 };

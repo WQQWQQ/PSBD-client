@@ -27,6 +27,8 @@
             return((+new Date()) - performance.timing.navigationStart);
         };
     }
+    Number.parseInt=Number.parseInt || window.parseInt;
+    Number.parseFloat=Number.parseFloat || window.parseFloat;
 
     (function() {
         let lastTime = 0,

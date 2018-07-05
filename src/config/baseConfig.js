@@ -189,8 +189,8 @@ const personFieldMap = {
     hyzk: '婚姻状况',
     llsj: '联系手机',
     fwcs: '服务处所',
-    ssxjgajgdm: '所属县级公安机关机构代码',
-    ssxjgajgmc: '所属县级公安机关名称',
+    ssxjgajgdm: '所属公安机关机构代码',
+    ssxjgajgmc: '所属公安机关名称',
     sspcsmc: '所属派出所名称',
     sspcsjgdm: '所属派出所机构代码'
 };

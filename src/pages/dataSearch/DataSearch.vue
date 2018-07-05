@@ -5,7 +5,7 @@
             <h1><img src="../../images/dataSearch/data-search-logo.png" height="60" width="54">数据搜索</h1>
         </div>
         <div class="data-search-input" :class="{'top':!firstShow}">
-            <AutoComplete size="large" v-model="searchText" :data="candidateList" @on-search="inputChange" @on-select="search" placeholder="请输入简单的关键词，如人员、物品、案件、组织、综合"></AutoComplete>
+            <AutoComplete size="large" v-model.trim="searchText" :data="candidateList" @on-search="inputChange" @on-select="search" placeholder="请输入简单的关键词，如人员、物品、案件、组织、综合"></AutoComplete>
             <Button type="primary" size="large" @click.native="search" icon="ios-search-strong"></Button>
         </div>
         <p v-if="firstShow" class="toggle-rule" @click="showRules=!showRules;">{{showRules?'收起':'展开'}}规则说明
@@ -13,8 +13,7 @@
         </p>
         <transition name="fade">
             <div class="rule-wrapper" v-show="showRules && firstShow">
-                <p>
-                    <Icon type="information-circled"></Icon>检索规则说明：</p>
+                <p><Icon type="information-circled"></Icon>检索规则说明：</p>
                 <ol class="rule-list">
                     <li class="rule-item">1、输入完整证件号码、身份证号码前6位，如：320106196806050014、320406</li>
                     <li class="rule-item">2、输入姓名，如：张三、zhangsan</li>

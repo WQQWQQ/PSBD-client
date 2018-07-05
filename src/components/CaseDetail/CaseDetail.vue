@@ -146,18 +146,15 @@
             <Button v-if="id" type="success" @click="exportData">导出</Button>
             <Button v-if="id" type="success" @click="print">打印</Button>
         </div>
-        <Spin fix v-show="spin">
-            <Icon type="load-c" size="18" class="demo-spin-icon-load"></Icon>
-            <div>加载中...</div>
-        </Spin>
+        <Spin fix v-show="spin"></Spin>
     </Modal>
 </template>
 <script>
-    import {exportWordData} from '../../services/getData';
+    import {exportWordData} from '@/services/getData';
     import {
         deepCopy
     }
-    from '../../services/utils';
+    from '@/services/utils';
     export default {
         name: 'CaseDetail',
         props: {
@@ -198,10 +195,10 @@
             },
             exportData(){
                 let data=deepCopy(this.data);
-                Reflect.deleteProperty(data.caseInfo,"defaultSrc");
-                Reflect.deleteProperty(data.caseInfo,"CONTEXT");
-                Reflect.deleteProperty(data.caseInfo,"caseStateSrc");
-                exportWordData(this.type,this.id,{},{},JSON.stringify(data));
+                ["defaultSrc","CONTEXT","caseStateSrc"].map(val => Reflect.deleteProperty(data.caseInfo, val));
+                exportWordData(this.type,this.id,{
+                    caseDetail:JSON.stringify(data)
+                });
             },
             print() {
                 window.print && window.print();

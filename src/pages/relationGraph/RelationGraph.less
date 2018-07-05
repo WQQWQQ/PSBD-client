@@ -1,6 +1,7 @@
 @import '../../style/mixins';
 @import '../../style/common';
 @nodeDetailPanel: 300px;
+@deep: ~'>>>';
 
 .center-block {
     width: 40%;
@@ -8,7 +9,7 @@
 }
 
 .hide-icon {
-    /deep/ i.ivu-icon-android-close {
+    @{deep} i.ivu-icon-android-close {
         display: none !important;
     }
 
@@ -60,7 +61,7 @@
         height: 50px;
         margin: 35px auto 10px;
 
-        /deep/ .ivu-btn {
+        @{deep} .ivu-btn {
             height: 50px;
             line-height: 46px;
 
@@ -71,14 +72,14 @@
 
         }
 
-        /deep/ .ivu-input {
+        @{deep} .ivu-input {
             height: auto;
             height: 50px;
             padding: 0 7px 0 10px;
             border-radius: 4px 0 0 4px;
         }
 
-        /deep/ .ivu-input-icon {
+        @{deep} .ivu-input-icon {
             height: 50px;
             line-height: 50px;
             color: #b6c1d1;
@@ -94,19 +95,19 @@
             left: 20px;
             background-image: none;
 
-            /deep/ .ivu-input {
+            @{deep} .ivu-input {
                 height: 30px;
                 padding-left: 35px;
                 background: #f5f9ff url('../../images/relationGraph/search.png') 10px center no-repeat;
             }
 
-            /deep/ .ivu-input-icon {
+            @{deep} .ivu-input-icon {
                 height: 30px;
                 line-height: 30px;
                 right: 60px;
             }
 
-            /deep/ .ivu-input-group-append {
+            @{deep} .ivu-input-group-append {
                 width: 68px;
 
                 .ivu-btn {
@@ -117,7 +118,7 @@
 
             }
 
-            /deep/ .placeholder {
+            @{deep} .placeholder {
                 top: 5px;
                 left: 40px;
             }
@@ -269,7 +270,7 @@
         top: 50px;
         left: 20px;
 
-        /deep/ .ivu-collapse-header {
+        @{deep} .ivu-collapse-header {
             padding-left: 15px;
             font-size: 14px;
             border-bottom: 1px solid #cee0f0;
@@ -282,7 +283,7 @@
 
         }
 
-        /deep/ .ivu-collapse-content {
+        @{deep} .ivu-collapse-content {
             overflow: auto;
             max-height: 350px;
             padding: 0 10px;
@@ -364,12 +365,12 @@
                     width: 176px;
                     position: relative;
 
-                    /deep/ .ivu-select-dropdown {
+                    @{deep} .ivu-select-dropdown {
                         right: 0 !important;
                         left: auto !important;
                     }
 
-                    /deep/ .ivu-input {
+                    @{deep} .ivu-input {
                         font-size: 12px;
                     }
 
@@ -429,7 +430,7 @@
             box-shadow: 0 0 3px rgba(85, 176, 255, .3);
         }
 
-        /deep/ .ivu-card-body {
+        @{deep} .ivu-card-body {
             padding: 0;
 
             .search-list {
@@ -482,13 +483,13 @@
             background-color: #fbfcff;
         }
 
-        /deep/ .ivu-card-head {
+        @{deep} .ivu-card-head {
             padding: 6px;
             text-align: center;
             .vertical-gradient(#ffffff, #eff6ff);
         }
 
-        /deep/ .ivu-card-body {
+        @{deep} .ivu-card-body {
             padding: 0;
             font-size: 12px;
 

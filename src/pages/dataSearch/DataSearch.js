@@ -4,29 +4,34 @@ import {
     getSearchDetailMsg,
     getDataSearchInfoByTypeAndId
 }
-from '../../services/getData';
-import {
-    trim
-}
-from '../../services/utils';
+from '@/services/getData';
 import {
     DATA_CATEGORY_TYPE,
     DATA_CATEGORY_TYPE_MAP,
     PERSON_TYPE
 }
-from '../../config/baseConfig';
+from '@/config/baseConfig';
 
-import carDefaultSrc from '../../images/superRecord/car-default.png';
-import caseDefaultSrc from '../../images/superRecord/case-default.png';
-import personDefaultSrc from '../../images/superRecord/people-default.png';
-import compleStateSrc from '../../images/dataSearch/compleState.png';
-import unStateSrc from '../../images/dataSearch/unState.png';
+import carDefaultSrc from '@/images/superRecord/car-default.png';
+import caseDefaultSrc from '@/images/superRecord/case-default.png';
+import personDefaultSrc from '@/images/superRecord/people-default.png';
+import compleStateSrc from '@/images/dataSearch/compleState.png';
+import unStateSrc from '@/images/dataSearch/unState.png';
+
+import CarDetail from '@/components/CarDetail/CarDetail';
+import CaseDetail from '@/components/CaseDetail/CaseDetail';
+import PersonDetail from '@/components/PersonDetail/PersonDetail';
 
 export default {
+    components: {
+        CarDetail,
+        CaseDetail,
+        PersonDetail
+    },
     data() {
         return {
-            itemId:null,
-            itemType:null,
+            itemId: null,
+            itemType: null,
             selectType: '',
             hoverType: '',
             personTypeSelect: [],
@@ -87,19 +92,17 @@ export default {
         uniqueData() {
             let arr = [],
                 obj = {};
-            for(let i = 0, len = this.allShowData.length; i < len; i++) {
-                let data = this.allShowData[i];
-                let idCardNum = data.idCardNum;
-                if(!idCardNum) {
+            this.allShowData.map(data => {
+                const { idCardNum } = data;
+                if (!idCardNum) {
                     arr.push(data);
-                }
-                else {
-                    if(!obj[idCardNum]) {
+                } else {
+                    if (!obj[idCardNum]) {
                         obj[idCardNum] = true;
                         arr.push(data);
                     }
                 }
-            }
+            });
             this.allShowData = arr;
         },
         selectNodeType(val) {
@@ -110,11 +113,12 @@ export default {
             this.dataContextArr = this.allShowData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
         },
         getRender() {
-            return(h, {
+            return (h, {
                 root,
                 node,
                 data
             }) => {
+                const {title}=data;
                 return h('span', {
                     style: {
                         display: 'inline-block',
@@ -127,10 +131,10 @@ export default {
                         click: () => {
                             this.$refs.content.scrollTop = 0;
                             this.selectTreeNode(data);
-                            this.selectType = data.title;
+                            this.selectType = title;
                         },
                         mouseover: () => {
-                            this.hoverType = data.title;
+                            this.hoverType = title;
                         },
                         mouseout: () => {
                             this.hoverType = '';
@@ -139,8 +143,8 @@ export default {
                 }, [
                     h('span', {
                         class: {
-                            selectNodeBg: this.selectType == data.title,
-                                hoverNodeBg: this.hoverType == data.title
+                            selectNodeBg: this.selectType == title,
+                            hoverNodeBg: this.hoverType == title,
                         },
                         style: {
                             position: 'absolute',
@@ -152,8 +156,8 @@ export default {
                     }),
                     h('span', {
                         class: {
-                            fontColor: this.selectType == data.title,
-                                hFontColor: this.hoverType == data.title
+                            fontColor: this.selectType == title,
+                            hFontColor: this.hoverType == title,
                         },
                         style: {
                             fontSize: '14px',
@@ -162,7 +166,7 @@ export default {
                             position: 'relative',
                             zIndex: 5
                         }
-                    }, data.title)
+                    }, title)
                 ]);
             };
         },
@@ -171,19 +175,16 @@ export default {
             node,
             data
         }) {
-            if(data.title) {
-                let type = data.type;
+            const {title,type}=data;
+            if (title) {
                 let bgIcon = '';
-                if(!type || type == DATA_CATEGORY_TYPE.ALL) {
+                if (!type || type == DATA_CATEGORY_TYPE.ALL) {
                     bgIcon = 'all';
-                }
-                else if(type == DATA_CATEGORY_TYPE.ALL_CASE || DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CASE].indexOf(type) > -1) {
+                } else if (type == DATA_CATEGORY_TYPE.ALL_CASE || DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CASE].indexOf(type) > -1) {
                     bgIcon = 'case';
-                }
-                else if(type == DATA_CATEGORY_TYPE.ALL_CAR || DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CAR].indexOf(type) > -1) {
+                } else if (type == DATA_CATEGORY_TYPE.ALL_CAR || DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CAR].indexOf(type) > -1) {
                     bgIcon = 'car';
-                }
-                else {
+                } else {
                     bgIcon = 'person';
                 }
                 return h('span', {
@@ -197,10 +198,10 @@ export default {
                     on: {
                         click: () => {
                             this.selectTreeNode(data);
-                            this.selectType = data.title;
+                            this.selectType = title;
                         },
                         mouseover: () => {
-                            this.hoverType = data.title;
+                            this.hoverType = title;
                         },
                         mouseout: () => {
                             this.hoverType = '';
@@ -209,8 +210,8 @@ export default {
                 }, [
                     h('span', {
                         class: {
-                            selectNodeBg: this.selectType == data.title,
-                                hoverNodeBg: this.hoverType == data.title
+                            selectNodeBg: this.selectType == title,
+                            hoverNodeBg: this.hoverType == title,
                         },
                         style: {
                             position: 'absolute',
@@ -222,8 +223,8 @@ export default {
                     }),
                     h('span', {
                         class: {
-                            fontColor: this.selectType == data.title,
-                                hFontColor: this.hoverType == data.title
+                            fontColor: this.selectType == title,
+                            hFontColor: this.hoverType == title
                         },
                         style: {
                             fontSize: '14px',
@@ -233,18 +234,18 @@ export default {
                             position: 'relative',
                             zIndex: 5
                         }
-                    }, data.title)
+                    }, title)
                 ]);
             }
         },
         selectTreeNode(nodes) {
-            if(nodes) {
+            if (nodes) {
                 let node = nodes[0] || nodes || {};
                 node.expand = !node.expand;
                 let type = node.type;
                 this.categoryType = DATA_CATEGORY_TYPE.ALL;
                 this.currentPage = 1;
-                if(type >= 0 && type <= 13) {
+                if (type >= 0 && type <= 13) {
                     this.allShowData = this.totalData.filter(item => type == item.OBJ_TYPE);
                     this.uniqueData();
                     this.currentPage = 1;
@@ -253,35 +254,26 @@ export default {
             }
         },
         createTree() {
-            this.$http(getDataSearchDirectory(this.searchText), (res) => {
-                let data = res.data;
-                if(!res.code && data) {
-                    let {
-                        context,
-                        catatory
-                    } = data, dataArray = {};
-                    if(context && catatory) {
-                        let {
-                            title,
-                            children
-                        } = catatory;
-                        for(let i = 0, len = context.length; i < len; i++) {
+            getDataSearchDirectory(this.searchText).then(res => {
+                const {code,data} = res;
+                if (!code && data) {
+                    let { context, catatory } = data, dataArray = {};
+                    if (context && catatory) {
+                        let { title, children } = catatory;
+                        for (let i = 0, len = context.length; i < len; i++) {
                             let item = context[i];
                             let type = item.OBJ_TYPE;
-                            if(DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CASE].indexOf(+type) > -1) {
+                            if (DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CASE].indexOf(+type) > -1) {
                                 item.defaultSrc = caseDefaultSrc;
                                 item.case = true;
-                                if(item.AJZT == '已破') {
+                                if (item.AJZT == '已破') {
                                     item.caseStateSrc = compleStateSrc;
-                                }
-                                else if(item.AJZT == '未破') {
+                                } else if (item.AJZT == '未破') {
                                     item.caseStateSrc = unStateSrc;
                                 }
-                            }
-                            else if(DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CAR].indexOf(+type) > -1) {
+                            } else if (DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CAR].indexOf(+type) > -1) {
                                 item.defaultSrc = carDefaultSrc;
-                            }
-                            else {
+                            } else {
                                 item.defaultSrc = personDefaultSrc;
                                 item.sex = item.XB || item.XBDM;
                                 item.idCardNum = item.GMSFZHM || item.GMSFHM || item.ZJHM || item.SFZH;
@@ -294,22 +286,21 @@ export default {
                         dataArray.expand = true;
                         dataArray.title = title;
                         this.selectType = dataArray.title;
-                        if(children) {
-                            for(let i = 0, len1 = children.length; i < len1; i++) {
+                        if (children) {
+                            for (let i = 0, len1 = children.length; i < len1; i++) {
                                 let child = children[i];
                                 child.expand = true;
                                 let grandson = child.children;
-                                if(grandson) {
-                                    for(let j = 0, len2 = grandson.length; j < len2; j++) {
+                                if (grandson) {
+                                    for (let j = 0, len2 = grandson.length; j < len2; j++) {
                                         let children2 = grandson[j];
                                         children2.expand = true;
                                         let grandChild = children2.children;
-                                        if(grandChild) {
-                                            for(let m = 0, len3 = grandChild.length; m < len3; m++) {
+                                        if (grandChild) {
+                                            for (let m = 0, len3 = grandChild.length; m < len3; m++) {
                                                 grandChild[m].render = this.getRender();
                                             }
-                                        }
-                                        else {
+                                        } else {
                                             children2.render = this.getRender();
                                         }
                                     }
@@ -320,84 +311,58 @@ export default {
                     }
                     this.categories = [dataArray];
                     this.selectNodeType(DATA_CATEGORY_TYPE.ALL);
-                }
-                else {
+                } else {
                     this.allShowData = [];
                     this.categories = [];
                     this.$Message.info('暂无数据');
                 }
-            }, (err) => {
-                this.$Message.error('网络错误');
-            });
+            }).catch(e=>console.error(e));
         },
         showDetail(item) {
             this.itemType = +item.OBJ_TYPE;
             this.itemId = +item.BID;
-            this.$http(getDataSearchInfoByTypeAndId(this.itemId, this.itemType), (res) => {
-                if(DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CASE].indexOf(this.itemType) > -1) {
+            getDataSearchInfoByTypeAndId(this.itemId, this.itemType).then(res => {
+                if (DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CASE].indexOf(this.itemType) > -1) {
                     this.caseDetailShow = true;
                     this.caseDetail.caseInfo = item;
-                }
-                else if(DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CAR].indexOf(this.itemType) > -1) {
+                } else if (DATA_CATEGORY_TYPE_MAP[DATA_CATEGORY_TYPE.ALL_CAR].indexOf(this.itemType) > -1) {
                     this.carDetailShow = true;
                     this.carDetail = item;
-                }
-                else {
+                } else {
                     this.personDetailShow = true;
                     this.personDetail.jurisdictionalUnit = item;
                 }
                 this.personTypeSelect = PERSON_TYPE[this.itemType] ? [PERSON_TYPE[this.itemType]] : [];
-                let data = res.data;
-                if(!res.code && data) {
-                    let {
-                        marriage,
-                        dataInfo
-                    } = data;
-                    if(dataInfo) {
-                        if(this.personDetailShow && marriage) {
+                const {code,data} = res;
+                if (!code && data) {
+                    const { marriage, dataInfo } = data;
+                    if (dataInfo) {
+                        if (this.personDetailShow && marriage) {
                             this.personDetail.marriage = marriage;
                             this.personDetail.jurisdictionalUnit.rytpdz = dataInfo.rytpdz;
-                        }
-                        else if(this.carDetailShow) {
+                        } else if (this.carDetailShow) {
                             this.carDetail.cltpdz = dataInfo.cltpdz;
                         }
                     }
                 }
-                else {
-                    this.$Message.info('暂无数据');
-                }
-            }, (err) => {
-                this.$Message.error('网络错误');
-            });
-        },
-        selectSearch(value) {
-            this.searchText = value;
-            this.createTree();
-        },
-        clearText() {
-            this.searchText = "";
+            }).catch(e=>console.error(e));
         },
         search() {
-            this.searchText = trim(this.searchText);
-            if(!this.searchText) {
-                this.$Message.warning('请输入查询信息');
-                return;
-            }
+            if (!this.searchText) return this.$Message.warning('请输入查询信息');
             this.firstShow = false;
             this.currentPage = 1;
+            this.candidateList = [];
             this.createTree();
         },
         inputChange(value) {
-            value = trim(value);
-            if(value) {
+            if (value) {
                 this.candidateList = [value];
-                this.$http(getKeyWorkByContext(value), res => {
-                    if(!res.code) {
+                getKeyWorkByContext(value).then(res => {
+                    if (!res.code) {
                         this.candidateList = res.data || [value];
                     }
                 });
-            }
-            else {
+            } else {
                 this.candidateList = [];
             }
         },
